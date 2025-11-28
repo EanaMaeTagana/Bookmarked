@@ -1,0 +1,41 @@
+
+.book-details-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.back-button-row {
+    text-align: right;
+    width: 100%;
+}
+
+.back-btn {
+    padding: 10px 15px;
+    margin: 40px 0;
+    font-family: 'Glacial Indifference', Arial, Helvetica, sans-serif;
+    text-transform: uppercase;
+    background: var(--text-black);
+    color: var(--text-white);
+    border: none;
+    border-radius: 50px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+
+.book-details-container {
+    background-color: var(--text-white);
+    padding: 50px;
+    border-radius: 50px; 
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); 
+    display: flex;
+    gap: 50px; 
+    width: 100%;
+}
+
+.book-cover {
+    width: 250px; /* Fixed width for the cover */ 
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); 
+}
+
