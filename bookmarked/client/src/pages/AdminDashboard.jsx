@@ -5,7 +5,6 @@ const AdminDashboard = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Fetch data from the protected Admin route
     fetch('http://localhost:3000/api/admin/stats', { credentials: 'include' })
       .then(res => {
         if (res.status === 403) throw new Error("⛔️ Access Denied: You are not an Admin!");
@@ -42,7 +41,7 @@ const AdminDashboard = () => {
         <p><strong>Current Admin:</strong> {stats.user.displayName}</p>
         <p><strong>Admin Email:</strong> {stats.user.email}</p>
         
-        {/* This is where you would add buttons like "Manage Users" or "Add Book" */}
+        {/* "Manage Users" or "Add Book" */}
         <button style={{ marginTop: '10px', padding: '10px', cursor: 'pointer' }}>
           Manage Users (Coming Soon)
         </button>

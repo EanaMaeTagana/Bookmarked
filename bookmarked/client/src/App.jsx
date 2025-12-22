@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'; // 👈 Added imports
+import { useEffect, useState } from 'react'; 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import AdminDashboard from './pages/AdminDashboard';
 import Navbar from "./components/Navbar";
@@ -11,22 +11,19 @@ import Footer from "./components/Footer";
 import BookDetails from "./pages/BookDetails";
 
 function App() {
-  // 1. Create state to hold the user info
   const [user, setUser] = useState(null);
 
-  // 2. Check if user is logged in when the app loads
   useEffect(() => {
     const getUser = async () => {
       try {
-        // ⚠️ Make sure this port matches your server (3000 or 3001)
         const response = await fetch("http://localhost:3000/auth/user", {
           method: "GET",
-          credentials: "include", // This sends the session cookie
+          credentials: "include", 
         });
 
         if (response.status === 200) {
           const data = await response.json();
-          setUser(data); // Save user to state
+          setUser(data); 
         }
       } catch (err) {
         console.log("Not logged in");
@@ -39,7 +36,7 @@ function App() {
   return (
     <Router>
       <div className="website-container">
-        {/* 3. Pass the user to the Navbar */}
+        {/*  */}
         <Navbar user={user} />
         
         <Routes>

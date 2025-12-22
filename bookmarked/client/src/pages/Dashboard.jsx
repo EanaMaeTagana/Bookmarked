@@ -1,10 +1,6 @@
-import TestBackend from "../components/Test.jsx";
-
 function Dashboard() {
     return (
-        <div>
-            <TestBackend/>
-        </div>
+        <h1>⚙️ Admin Dashboard</h1>
     )
 }
 export default Dashboard;

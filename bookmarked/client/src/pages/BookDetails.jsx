@@ -6,44 +6,38 @@ import axios from "axios";
 import "./BookDetails.css"; 
 
 function BookDetails() {
-  const { olid } = useParams(); // OLID from URL
+  const { olid } = useParams(); 
   const navigate = useNavigate();
   const [book, setBook] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  const [isAdding, setIsAdding] = useState(false);
 
-  // Fetch book and author data from OpenLibrary
   useEffect(() => {
     const fetchBookAndAuthors = async () => {
       try {
         setLoading(true);
         setError(null);
-        
-        // --- 1. Fetch Work Details ---
+
         const bookRes = await axios.get(`https://openlibrary.org/works/${olid}.json`);
         const bookData = bookRes.data;
         let authorNames = [];
 
         if (bookData.authors && bookData.authors.length > 0) {
-          // --- 2. Extract Author Keys and Create Robust Author Fetch Promises ---
           const authorPromises = bookData.authors.map(authorObj => {
             const authorKey = authorObj.author.key; 
-            
-            // Create the API request promise, adding a catch block for robustness
             return axios.get(`https://openlibrary.org${authorKey}.json`)
-              .then(res => res.data.name) // Success: Return the author name
+              .then(res => res.data.name) 
               .catch(err => {
-                // Failure: Log the error and return a fallback name
                 console.warn(`Failed to fetch name for author key: ${authorKey}`, err.message);
                 return "Author Unavailable"; 
               });
           });
 
-          // --- 3. Execute all Author Fetches Concurrently ---
           authorNames = await Promise.all(authorPromises);
         }
 
-        // --- 4. Update State with Book Data and Author Names ---
         setBook({ ...bookData, authorNames: authorNames });
         
       } catch (err) {
@@ -57,19 +51,57 @@ function BookDetails() {
     fetchBookAndAuthors();
   }, [olid]);
 
+  const addToBookshelf = async () => {
+    try {
+      setIsAdding(true);
+      
+      const coverUrl = book.covers 
+        ? `https://covers.openlibrary.org/b/id/${book.covers[0]}-L.jpg` 
+        : "https://via.placeholder.com/150"; 
+
+      const payload = {
+        bookId: olid,                 
+        title: book.title,            
+        authors: book.authorNames,    
+        coverImage: coverUrl,        
+      };
+
+      await axios.post("http://localhost:3000/api/bookshelf/add", payload, {
+        withCredentials: true 
+      });
+
+      alert("✅ Book added to your shelf successfully!");
+
+    } catch (err) {
+      console.error("Error adding book:", err);
+      
+      if (err.response) {
+        if (err.response.status === 400) {
+          alert("⚠️ You already have this book in your library!");
+        } 
+        else if (err.response.status === 401 || err.response.status === 403) {
+          alert("Please login to add books to your shelf.");
+        } 
+        else {
+          alert(err.response.data?.error || "Failed to add book. Please try again.");
+        }
+      } else {
+        alert("❌ Network Error: Could not reach the server.");
+      }
+    } finally {
+      setIsAdding(false);
+    }
+  };
+
   if (loading) return <div className="loading">Loading...</div>;
   if (error) return <div className="error">{error}</div>;
   if (!book) return <div className="error">Book not found.</div>;
 
   const coverId = book.covers ? book.covers[0] : null;
   const title = book.title || "Untitled";
-  
-  // FIXED: Authors are now pulled from the authorNames array added to the state
   const authors = book.authorNames ? book.authorNames.join(", ") : "Unknown author";
-  
   const publishYear = book.first_publish_date || "Unknown year";
   
-  // Cleanly extract description
   const description = book.description
     ? typeof book.description === "string"
       ? book.description
@@ -80,7 +112,6 @@ function BookDetails() {
     <div className="container">
 
       <Header />
-
       <HorizontalLine />
       
       <div className="book-details-page">
@@ -102,10 +133,18 @@ function BookDetails() {
 
           <div className="book-info">
             <h1>{title}</h1>
-            {/* FIXED: Authors display as names */}
             <h3>By: {authors}</h3>
             <p><strong>First Published:</strong> {publishYear}</p>
-            {/* Subjects field removed */}
+            
+            <button 
+              className="add-btn" 
+              onClick={addToBookshelf} 
+              disabled={isAdding}
+              style={{ margin: "20px 0", padding: "10px 20px", cursor: "pointer", backgroundColor: "#007bff", color: "white", border: "none", borderRadius: "5px" }}
+            >
+              {isAdding ? "Adding..." : "Add to Bookshelf"}
+            </button>
+
             <p className="description">{description}</p>
           </div>
         </div>

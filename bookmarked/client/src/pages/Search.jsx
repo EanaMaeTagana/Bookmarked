@@ -5,7 +5,7 @@ import HorizontalLine from "../components/HorizontalLine.jsx";
 import axios from "axios";
 import "./Search.css"; 
 
-const BACKEND_URL = "http://localhost:3001"; 
+const BACKEND_URL = "http://localhost:3000"; 
 
 const CARD_COLORS = [
   'var(--pastel-purple)',
@@ -28,22 +28,18 @@ function Search() {
   const booksPerPage = 20;
   const maxResults = 1000;
 
-  // --- Debounce Logic ---
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedQuery(query), 300);
     return () => clearTimeout(timer);
   }, [query]);
 
-  // Reset page whenever search or category changes 
   useEffect(() => setPage(1), [debouncedQuery, category]);
 
-  // --- Search Handler for Button/Enter Key (Required for consistency) ---
   const handleSearchSubmit = () => {
     setDebouncedQuery(query);
     setPage(1); 
   };
 
-  // --- API Logic (Wrapped in useCallback for optimization) ---
   const buildApiUrl = useCallback(() => {
     const params = new URLSearchParams();
     
@@ -83,7 +79,6 @@ function Search() {
     fetchBooks();
   }, [fetchBooks]);
 
-  // lastPage is capped at 50 to limit results based on maxResults=1000 and booksPerPage=20
   const lastPage = Math.min(Math.ceil(numFound / booksPerPage), 50);
 
   const renderPageButtons = () => {
@@ -91,7 +86,6 @@ function Search() {
 
   const buttons = [];
 
-  // --- Helper Function to Create a Page Button ---
   const createButton = (pageNumber) => (
     <button 
       key={pageNumber} 
@@ -102,7 +96,6 @@ function Search() {
     </button>
   );
 
-  // --- 1. Previous Button (Used for sequential navigation) ---
   buttons.push(
     <button 
       key="prev" 
@@ -114,33 +107,28 @@ function Search() {
     </button>
   );
 
-  // --- 2. Identify Unique Pages to Display (First, Adjacent, Current, Adjacent, Last) ---
   const pagesToShow = new Set();
   
-  pagesToShow.add(1); // First page
+  pagesToShow.add(1); 
   
-  // Add the page before the current page
   if (page > 1) {
     pagesToShow.add(page - 1);
   }
   
-  pagesToShow.add(page); // Current page
+  pagesToShow.add(page); 
   
-  // Add the page after the current page
   if (page < lastPage) {
     pagesToShow.add(page + 1);
   }
 
   if (lastPage > 1) {
-    pagesToShow.add(lastPage); // Last page
+    pagesToShow.add(lastPage); 
   }
 
-  // --- 3. Render the Final Pages (with ellipses for gaps) ---
   const sortedPages = [...pagesToShow].sort((a, b) => a - b);
   let prevPage = 0;
 
   sortedPages.forEach(pageNumber => {
-    // Add ellipsis if there's a gap between the previous rendered button and this one
     if (pageNumber > prevPage + 1 && prevPage !== 0) {
       buttons.push(<span key={`ell-${pageNumber}`} className="ellipsis">…</span>);
     }
@@ -149,7 +137,6 @@ function Search() {
     prevPage = pageNumber;
   });
 
-  // --- 4. Next Button (Used for sequential navigation) ---
   buttons.push(
     <button 
       key="next" 
@@ -165,7 +152,6 @@ function Search() {
   return buttons;
 };
 
-  // --- JSX Structure ---
   return (
     
     <div className="container">
@@ -210,8 +196,6 @@ function Search() {
           books.map((book, index) => { 
             const coverId = book.cover_i; 
             const authors = book.author_name || []; 
-            
-            // const backgroundColor = CARD_COLORS[index % CARD_COLORS.length]; // Removed unused variable
 
             return ( 
               <Link 
