@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-
 const Bookshelf = require('../models/Bookshelf'); 
 
 // --- 1. GET ALL BOOKS ---
@@ -46,12 +45,12 @@ router.post('/add', async (req, res) => {
   }
 });
 
-// --- 3. UPDATE BOOK ---
+// --- 3. UPDATE BOOK 
 router.put('/:id', async (req, res) => {
   try {
     if (!req.user) return res.status(401).json({ error: "Not logged in" });
 
-    const { shelf, notes } = req.body;
+    const { shelf, notes, memorableScene, quotes, rating, dateRead, isTopPick } = req.body;
 
     let book = await Bookshelf.findOne({ _id: req.params.id, user: req.user._id });
 
@@ -59,6 +58,12 @@ router.put('/:id', async (req, res) => {
 
     if (shelf) book.shelf = shelf;
     if (notes !== undefined) book.notes = notes;
+    if (memorableScene !== undefined) book.memorableScene = memorableScene;
+    if (quotes !== undefined) book.quotes = quotes;
+    if (rating !== undefined) book.rating = rating;
+    if (dateRead !== undefined) book.dateRead = dateRead;
+    
+    if (isTopPick !== undefined) book.isTopPick = isTopPick;
 
     await book.save();
     res.json(book);

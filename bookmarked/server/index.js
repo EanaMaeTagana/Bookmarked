@@ -5,17 +5,17 @@ const session = require('express-session');
 const passport = require('passport');
 require('dotenv').config();
 
+// Routes
 const bookshelfRoute = require('./routes/bookshelf');
 const authRoutes = require('./routes/auth');
+const adminRoutes = require('./routes/admin'); 
 require('./config/passport'); 
-
-const isAdmin = require('./middleware/isAdmin');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const OPEN_LIBRARY_BASE_URL = 'https://openlibrary.org/search.json';
 
-// --- DATABASE CONNECTION ---
+// --- DATABASE ---
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ MongoDB Connected'))
   .catch(err => console.error('❌ MongoDB Connection Error:', err));
@@ -36,22 +36,13 @@ app.use(session({
   cookie: { secure: false } 
 }));
 
-
 app.use(passport.initialize());
 app.use(passport.session());
 
 // --- ROUTES ---
-
 app.use('/auth', authRoutes);
-
 app.use('/api/bookshelf', bookshelfRoute);
-
-app.get('/api/admin/stats', isAdmin, (req, res) => {
-  res.json({ 
-    message: "🎉 Welcome Admin! You have access to the secret data.", 
-    user: req.user 
-  });
-});
+app.use('/api/admin', adminRoutes); 
 
 app.get('/api/search-books', async (req, res) => {
     const queryString = new URLSearchParams(req.query).toString();

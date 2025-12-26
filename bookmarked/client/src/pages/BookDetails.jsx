@@ -6,150 +6,203 @@ import axios from "axios";
 import "./BookDetails.css"; 
 
 function BookDetails() {
-  const { olid } = useParams(); 
+  const { olid } = useParams();
   const navigate = useNavigate();
+  
   const [book, setBook] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
+  // State for Saving
   const [isAdding, setIsAdding] = useState(false);
+  const [savedBookId, setSavedBookId] = useState(null); // To track if we already saved it
 
+  // Diary Form State
+  const [diaryForm, setDiaryForm] = useState({
+    memorableScene: "",
+    quotes: "",
+    dateRead: "",
+    rating: ""
+  });
+
+  // 1. Fetch Book Details
   useEffect(() => {
-    const fetchBookAndAuthors = async () => {
+    const fetchBookData = async () => {
       try {
         setLoading(true);
-        setError(null);
-
-        const bookRes = await axios.get(`https://openlibrary.org/works/${olid}.json`);
-        const bookData = bookRes.data;
-        let authorNames = [];
-
-        if (bookData.authors && bookData.authors.length > 0) {
-          const authorPromises = bookData.authors.map(authorObj => {
-            const authorKey = authorObj.author.key; 
-            return axios.get(`https://openlibrary.org${authorKey}.json`)
-              .then(res => res.data.name) 
-              .catch(err => {
-                console.warn(`Failed to fetch name for author key: ${authorKey}`, err.message);
-                return "Author Unavailable"; 
-              });
-          });
-
-          authorNames = await Promise.all(authorPromises);
+        // Fetch OpenLibrary Data
+        const res = await axios.get(`https://openlibrary.org/works/${olid}.json`);
+        const bookData = res.data;
+        
+        // Fetch Author Name
+        let authorNames = ["Unknown Author"];
+        if (bookData.authors?.length > 0) {
+          const authorRes = await axios.get(`https://openlibrary.org${bookData.authors[0].author.key}.json`);
+          authorNames = [authorRes.data.name];
         }
 
-        setBook({ ...bookData, authorNames: authorNames });
+        setBook({ ...bookData, authorNames });
         
+        const myBooksRes = await axios.get('http://localhost:3000/api/bookshelf', { withCredentials: true });
+        const existingBook = myBooksRes.data.find(b => b.bookId === olid);
+        
+        if (existingBook) {
+          setSavedBookId(existingBook._id);
+          setDiaryForm({
+            memorableScene: existingBook.memorableScene || "",
+            quotes: existingBook.quotes || "",
+            dateRead: existingBook.dateRead ? existingBook.dateRead.split('T')[0] : "",
+            rating: existingBook.rating || ""
+          });
+        }
+
       } catch (err) {
-        console.error("Error fetching book or author details:", err.message);
-        setError("Failed to load book details.");
+        console.error(err);
+        setError("Failed to load details");
       } finally {
         setLoading(false);
       }
     };
-
-    fetchBookAndAuthors();
+    fetchBookData();
   }, [olid]);
 
+  // 2. Handle "Add to Shelves" (Basic Save)
   const addToBookshelf = async () => {
     try {
       setIsAdding(true);
-      
       const coverUrl = book.covers 
         ? `https://covers.openlibrary.org/b/id/${book.covers[0]}-L.jpg` 
         : "https://via.placeholder.com/150"; 
 
       const payload = {
-        bookId: olid,                 
-        title: book.title,            
-        authors: book.authorNames,    
-        coverImage: coverUrl,        
+        bookId: olid,
+        title: book.title,
+        authors: book.authorNames,
+        coverImage: coverUrl
       };
 
-      await axios.post("http://localhost:3000/api/bookshelf/add", payload, {
-        withCredentials: true 
-      });
-
-      alert("✅ Book added to your shelf successfully!");
+      const res = await axios.post("http://localhost:3000/api/bookshelf/add", payload, { withCredentials: true });
+      setSavedBookId(res.data._id); 
+      alert("✅ Added to your shelf!");
 
     } catch (err) {
-      console.error("Error adding book:", err);
-      
-      if (err.response) {
-        if (err.response.status === 400) {
-          alert("⚠️ You already have this book in your library!");
-        } 
-        else if (err.response.status === 401 || err.response.status === 403) {
-          alert("Please login to add books to your shelf.");
-        } 
-        else {
-          alert(err.response.data?.error || "Failed to add book. Please try again.");
-        }
+      if (err.response?.status === 400) {
+        alert("⚠️ You already have this book! You can fill out the diary below.");
       } else {
-        alert("❌ Network Error: Could not reach the server.");
+        alert("Error saving book.");
       }
     } finally {
       setIsAdding(false);
     }
   };
 
+  // 3. Handle "Add to Dashboard Diary" (Update with Details)
+  const saveDiaryEntry = async () => {
+    if (!savedBookId) {
+      alert("Please click 'Add to Shelves' first!");
+      return;
+    }
+
+    try {
+      await axios.put(`http://localhost:3000/api/bookshelf/${savedBookId}`, diaryForm, {
+        withCredentials: true
+      });
+      alert("✅ Diary entry saved to Dashboard!");
+      navigate('/dashboard'); 
+    } catch (err) {
+      console.error(err);
+      alert("Failed to save diary entry.");
+    }
+  };
+
   if (loading) return <div className="loading">Loading...</div>;
-  if (error) return <div className="error">{error}</div>;
   if (!book) return <div className="error">Book not found.</div>;
 
   const coverId = book.covers ? book.covers[0] : null;
-  const title = book.title || "Untitled";
-  const authors = book.authorNames ? book.authorNames.join(", ") : "Unknown author";
-  const publishYear = book.first_publish_date || "Unknown year";
-  
-  const description = book.description
-    ? typeof book.description === "string"
-      ? book.description
-      : book.description.value
-    : "No description available.";
 
   return (
     <div className="container">
-
       <Header />
       <HorizontalLine />
       
-      <div className="book-details-page">
-        
-        <div className="back-button-row">
-          <button className="back-btn" onClick={() => navigate(-1)}>Back</button>
-        </div>
+      {/* --- TOP SECTION: BOOK INFO --- */}
+      <div className="book-details-container" style={{ padding: '40px', display: 'flex', gap: '40px', justifyContent: 'center' }}>
+        <img
+          src={coverId ? `https://covers.openlibrary.org/b/id/${coverId}-L.jpg` : "https://via.placeholder.com/150"}
+          alt={book.title}
+          style={{ width: '200px', borderRadius: '10px', boxShadow: '0 5px 15px rgba(0,0,0,0.2)' }}
+        />
 
-        <div className="book-details-container">
-          {coverId ? (
-            <img
-              src={`https://covers.openlibrary.org/b/id/${coverId}-L.jpg`}
-              alt={title}
-              className="book-cover"
-            />
-          ) : (
-            <div className="no-cover">No Cover Image</div>
-          )}
+        <div className="book-info" style={{ maxWidth: '600px' }}>
+          <h1 style={{ color: '#4a6fa5', textTransform: 'uppercase', fontSize: '2rem' }}>{book.title}</h1>
+          <h3 style={{ fontStyle: 'italic', color: '#666' }}>{book.authorNames.join(", ")}</h3>
+          
+          <p style={{ lineHeight: '1.6', marginTop: '20px' }}>
+            {book.description?.value || book.description || "No description available."}
+          </p>
 
-          <div className="book-info">
-            <h1>{title}</h1>
-            <h3>By: {authors}</h3>
-            <p><strong>First Published:</strong> {publishYear}</p>
-            
+          {!savedBookId && (
             <button 
-              className="add-btn" 
               onClick={addToBookshelf} 
               disabled={isAdding}
-              style={{ margin: "20px 0", padding: "10px 20px", cursor: "pointer", backgroundColor: "#007bff", color: "white", border: "none", borderRadius: "5px" }}
+              className="pill-btn"
             >
-              {isAdding ? "Adding..." : "Add to Bookshelf"}
+              {isAdding ? "Adding..." : "+ ADD TO SHELVES"}
             </button>
+          )}
+        </div>
+      </div>
 
-            <p className="description">{description}</p>
+      {/* --- BOTTOM SECTION: DIARY FORM (BLUE) --- */}
+      <div className="diary-form-section">
+        <h2 className="diary-heading">LOVED THIS READ? RECORD IT IN YOUR DIGITAL DIARY.</h2>
+        
+        <div className="diary-card-blue">
+          
+          <label>WHAT WAS THE MOST UNFORGETTABLE SCENE IN THIS BOOK?</label>
+          <textarea 
+            rows="3"
+            value={diaryForm.memorableScene}
+            onChange={(e) => setDiaryForm({...diaryForm, memorableScene: e.target.value})}
+          />
+
+          <label>WHICH QUOTES FROM THIS BOOK STUCK WITH YOU THE MOST?</label>
+          <textarea 
+             rows="3"
+             value={diaryForm.quotes}
+             onChange={(e) => setDiaryForm({...diaryForm, quotes: e.target.value})}
+          />
+
+          <div className="form-row">
+            <div className="form-group">
+              <label>WHEN DID YOU READ THIS BOOK?</label>
+              <input 
+                type="date" 
+                value={diaryForm.dateRead}
+                onChange={(e) => setDiaryForm({...diaryForm, dateRead: e.target.value})}
+              />
+            </div>
+
+            <div className="form-group">
+              <label>HOW WOULD YOU RATE THIS BOOK? (0-10)</label>
+              <input 
+                type="number" 
+                min="0" max="10"
+                value={diaryForm.rating}
+                onChange={(e) => setDiaryForm({...diaryForm, rating: e.target.value})}
+              />
+            </div>
           </div>
+
         </div>
 
+        <div style={{ textAlign: 'center', marginTop: '20px' }}>
+          <button className="pill-btn" onClick={saveDiaryEntry}>
+            + ADD TO DASHBOARD DIARY
+          </button>
+        </div>
       </div>
+
     </div>
   );
 }

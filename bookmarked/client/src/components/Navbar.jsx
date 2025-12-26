@@ -12,12 +12,6 @@ function Navbar({ user }) {
       <Link to="/shelves">Shelves</Link>
       <Link to="/dashboard">Dashboard</Link>
 
-      {user && user.role === 'admin' && (
-        <Link to="/admin" style={{ color: 'red', fontWeight: 'bold' }}>
-          Admin Panel
-        </Link>
-      )}
-
       {!user ? (
         <button 
           onClick={() => window.location.href = `${API_BASE_URL}/auth/google`}
@@ -28,7 +22,7 @@ function Navbar({ user }) {
       ) : (
         <button 
           onClick={() => window.location.href = `${API_BASE_URL}/auth/logout`}
-          style={{ ...buttonStyle, backgroundColor: '#555' }} // Grey for logout
+          style={{ ...buttonStyle, backgroundColor: '#555' }}
         >
           Logout
         </button>

@@ -1,120 +1,127 @@
+/* --- PAGE LAYOUT --- */
 .shelves-container {
-  padding: 20px;
+  padding: 40px;
   max-width: 1200px;
   margin: 0 auto;
+  font-family: 'Times New Roman', serif;
 }
 
+/* --- HEADERS --- */
 .shelf-section h2 {
-  font-family: 'Times New Roman', serif; 
   text-transform: uppercase;
   border-bottom: 2px solid #000;
   padding-bottom: 10px;
-  margin-top: 40px;
+  margin-top: 50px;
   letter-spacing: 2px;
+  font-size: 1.5rem;
 }
 
+/* --- GRID SYSTEM --- */
 .shelf-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 30px;
-  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 40px;
+  margin-top: 30px;
+  justify-content: flex-start; /* Aligns items to the left */
 }
 
 .book-card {
-  position: relative; 
-  width: 100%;
+  width: 150px;
   text-align: center;
+}
+
+/* --- IMAGE CONTAINER (Crucial for Overlay) --- */
+.image-container {
+  position: relative; /* This holds the absolute overlay inside */
+  width: 150px;
+  height: 230px;
+  border-radius: 5px;
+  overflow: hidden;
+  box-shadow: 2px 4px 10px rgba(0,0,0,0.1);
   transition: transform 0.2s;
 }
 
-.book-card:hover {
-  transform: translateY(-5px); 
+.image-container:hover {
+  transform: translateY(-5px);
 }
 
 .book-cover {
   width: 100%;
-  height: 220px;
+  height: 100%;
   object-fit: cover;
-  border-radius: 5px;
-  box-shadow: 2px 4px 10px rgba(0,0,0,0.1);
+  display: block;
 }
 
-.book-info h3 {
-  font-size: 1rem;
-  margin: 10px 0 5px;
+/* --- THE OVERLAY (Dark Box on Hover) --- */
+.delete-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7); /* Dark see-through black */
+  
+  display: flex;       /* Centers buttons */
+  flex-direction: column; /* Stacks buttons vertically */
+  align-items: center;
+  justify-content: center;
+  gap: 15px;           /* Space between buttons */
+  
+  opacity: 0;          /* Hidden by default */
+  transition: opacity 0.3s ease;
+}
+
+/* Show Overlay when hovering the IMAGE CONTAINER */
+.image-container:hover .delete-overlay {
+  opacity: 1;
+}
+
+/* --- CIRCLE BUTTONS --- */
+.icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid white;
+  background: transparent;
+  color: white;
+  font-size: 1.2rem;
+  cursor: pointer;
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.icon-btn:hover {
+  background: white;
+  color: black;
+  transform: scale(1.1);
+}
+
+/* --- HEART SPECIFIC STYLES --- */
+.active-heart {
+  color: #ff4d4d !important; /* Red Color */
+  border-color: #ff4d4d !important;
   font-weight: bold;
 }
 
+/* --- TEXT INFO --- */
+.book-info h3 {
+  font-size: 0.95rem;
+  margin: 12px 0 5px;
+  font-weight: bold;
+  font-family: sans-serif;
+  line-height: 1.3;
+}
+
 .book-info p {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: #666;
   margin: 0;
 }
 
-.delete-overlay {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 50%;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  
-  opacity: 0; 
-  transition: opacity 0.2s ease-in-out;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-}
-
-.book-card:hover .delete-overlay {
-  opacity: 1;
-}
-
-.delete-btn {
-  color: red;
-  font-size: 1.2rem;
-  border: none;
-  background: none;
-  cursor: pointer;
-  padding: 0;
-}
-
-.delete-overlay {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  display: flex;
-  gap: 10px; 
-  opacity: 0; 
-  transition: opacity 0.2s ease-in-out;
-}
-
-.book-card:hover .delete-overlay {
-  opacity: 1;
-}
-
-/* Common style for the circle buttons */
-.icon-btn {
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 50%;
-  width: 35px;
-  height: 35px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  cursor: pointer;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-  transition: transform 0.1s;
-}
-
-.icon-btn:hover {
-  transform: scale(1.1);
-}
-
+/* --- MODAL (Popup) --- */
 .modal-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -122,22 +129,29 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 2000;
 }
 
 .modal-content {
   background: white;
   padding: 30px;
   border-radius: 10px;
-  width: 400px;
+  width: 350px;
   text-align: center;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
 }
 
-.modal-content select, .modal-content input {
+.modal-content h3 {
+  margin-top: 0;
+}
+
+.modal-content select, 
+.modal-content input {
   width: 100%;
   padding: 10px;
-  margin: 10px 0;
+  margin: 15px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
   font-size: 1rem;
 }
 

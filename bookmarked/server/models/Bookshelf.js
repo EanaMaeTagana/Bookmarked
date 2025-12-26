@@ -7,19 +7,25 @@ const BookshelfSchema = new mongoose.Schema({
     required: true
   },
 
+  // Standard Book Data
   bookId: { type: String, required: true },
   title: { type: String, required: true },
   authors: [String], 
   coverImage: String,
   
+  // Shelf Organization
   shelf: { 
     type: String, 
     default: 'Want to Read' 
   },
-  notes: { 
-    type: String, 
-    default: '' 
-  },
+  
+  // --- DIARY & JOURNAL FIELDS ---
+  notes: { type: String, default: '' }, 
+  memorableScene: { type: String, default: '' }, 
+  quotes: { type: String, default: '' },
+  rating: { type: Number, min: 0, max: 10, default: 0 }, 
+  dateRead: { type: Date }, 
+  isTopPick: { type: Boolean, default: false },
   addedAt: {
     type: Date,
     default: Date.now
