@@ -17,11 +17,9 @@ const AdminDashboard = () => {
   // 2. Fetch Data (Stats + User List)
   const fetchAdminData = async () => {
     try {
-      // Get Counts
       const statsRes = await axios.get('http://localhost:3000/api/admin/stats', { withCredentials: true });
       setStats(statsRes.data);
 
-      // Get All Users
       const usersRes = await axios.get('http://localhost:3000/api/admin/users', { withCredentials: true });
       setUsers(usersRes.data);
       
@@ -29,7 +27,7 @@ const AdminDashboard = () => {
     } catch (err) {
       console.error(err);
       alert("Access Denied: Admins Only");
-      navigate('/dashboard'); // Kick non-admins out
+      navigate('/dashboard'); 
     }
   };
 

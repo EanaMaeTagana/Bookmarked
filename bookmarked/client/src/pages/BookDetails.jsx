@@ -13,11 +13,9 @@ function BookDetails() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
-  // State for Saving
   const [isAdding, setIsAdding] = useState(false);
-  const [savedBookId, setSavedBookId] = useState(null); // To track if we already saved it
+  const [savedBookId, setSavedBookId] = useState(null); 
 
-  // Diary Form State
   const [diaryForm, setDiaryForm] = useState({
     memorableScene: "",
     quotes: "",
@@ -30,11 +28,9 @@ function BookDetails() {
     const fetchBookData = async () => {
       try {
         setLoading(true);
-        // Fetch OpenLibrary Data
         const res = await axios.get(`https://openlibrary.org/works/${olid}.json`);
         const bookData = res.data;
         
-        // Fetch Author Name
         let authorNames = ["Unknown Author"];
         if (bookData.authors?.length > 0) {
           const authorRes = await axios.get(`https://openlibrary.org${bookData.authors[0].author.key}.json`);

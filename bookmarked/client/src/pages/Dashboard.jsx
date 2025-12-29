@@ -12,6 +12,7 @@ const Dashboard = () => {
   // --- PROFILE EDIT STATE ---
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [profileForm, setProfileForm] = useState({
+    nickname: "", 
     bio: "",
     favoriteGenre: "",
     goal: 100
@@ -36,7 +37,9 @@ const Dashboard = () => {
       // 1. Get User
       const userRes = await axios.get('http://localhost:3000/auth/user', { withCredentials: true });
       setUser(userRes.data);
+      
       setProfileForm({
+        nickname: userRes.data.nickname || "", 
         bio: userRes.data.bio || "Book Lover <3",
         favoriteGenre: userRes.data.favoriteGenre || "Romance, Fantasy, Literature",
         goal: userRes.data.goal || 100
@@ -56,7 +59,7 @@ const Dashboard = () => {
   const handleSaveProfile = async () => {
     try {
       const res = await axios.put('http://localhost:3000/auth/update-profile', profileForm, { withCredentials: true });
-      setUser(res.data);
+      setUser(res.data); 
       setIsProfileModalOpen(false);
     } catch (err) {
       alert("Failed to update profile.");
@@ -132,7 +135,10 @@ const Dashboard = () => {
           <span className="active">DASHBOARD</span>
         </div>
 
-        <h1 className="greeting">HEY, {user?.displayName ? user.displayName.toUpperCase().split(' ')[0] : 'READER'}</h1>
+        {/* 🆕 UPDATED: Uses nickname if available, falls back to displayName or 'READER' */}
+        <h1 className="greeting">
+          HEY, {user?.nickname ? user.nickname.toUpperCase() : (user?.displayName ? user.displayName.toUpperCase().split(' ')[0] : 'READER')}
+        </h1>
 
         <div className="stats-pill">
           <div className="stat-left">
@@ -228,10 +234,22 @@ const Dashboard = () => {
         <div className="modal-overlay">
           <div className="modal-content">
             <h3>Edit Profile</h3>
+            
+            {/* 🆕 ADDED NICKNAME INPUT */}
+            <label>Nickname:</label>
+            <input 
+              type="text" 
+              value={profileForm.nickname} 
+              onChange={(e) => setProfileForm({...profileForm, nickname: e.target.value})} 
+              placeholder="Display Name"
+            />
+
             <label>Short Bio:</label>
             <input type="text" value={profileForm.bio} onChange={(e) => setProfileForm({...profileForm, bio: e.target.value})} />
+            
             <label>Genres:</label>
             <input type="text" value={profileForm.favoriteGenre} onChange={(e) => setProfileForm({...profileForm, favoriteGenre: e.target.value})} />
+            
             <label>Goal:</label>
             <input type="number" value={profileForm.goal} onChange={(e) => setProfileForm({...profileForm, goal: e.target.value})} />
             

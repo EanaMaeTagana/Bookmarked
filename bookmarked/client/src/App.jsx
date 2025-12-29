@@ -9,6 +9,7 @@ import Shelves from "./pages/Shelves";
 import Dashboard from "./pages/Dashboard";
 import Footer from "./components/Footer";
 import BookDetails from "./pages/BookDetails";
+import CreateProfile from "./pages/CreateProfile"; 
 
 function App() {
   const [user, setUser] = useState(null);
@@ -36,7 +37,6 @@ function App() {
   return (
     <Router>
       <div className="website-container">
-        {/*  */}
         <Navbar user={user} />
         
         <Routes>
@@ -47,6 +47,9 @@ function App() {
           <Route path="/book/:olid" element={<BookDetails />} />
           <Route path="/shelves" element={<Shelves />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          
+          {/* 👇 THE NEW ROUTE FOR DELETED/NEW USERS */}
+          <Route path="/create-profile" element={<CreateProfile />} />
         </Routes>
       </div>
       <Footer /> 
