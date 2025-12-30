@@ -1,0 +1,48 @@
+.hero-image {
+  margin-top: 50px;
+  width: 100%;         
+}
+
+.explore, .organize, .digitize {
+    margin: 100px 0;
+}
+
+.explore-image {
+    width: 100%;
+    margin: 30px 0;
+    }
+
+.organize-image {
+    width: 50%;
+    margin: 20px 0;
+}
+
+p {
+    font-family: 'Glacial Indifference', Arial, Helvetica, sans-serif;
+    font-size: clamp(14px, 2.5vw, 60px);
+    line-height: 1.6;
+}
+
+.CTA-button {
+  display: inline-block;   
+  background-color: var(--primary-blue); 
+  color: var(--text-white);
+  text-decoration: none;      
+  padding: 10px 40px;     
+  border-radius: 50px;       
+  border: 2px solid var(--primary-blue);  
+  transition: all 0.3s ease; 
+  margin-top: 50px;
+}
+
+.CTA-button p {
+  margin: 0;                  
+  font-size: clamp(10px, 1.5vw, 40px);
+  text-transform: uppercase;
+}
+
+.CTA-button:hover {
+  background-color: transparent;
+  color: #366baa;
+  transform: scale(1.1);     
+}

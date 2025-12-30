@@ -1,45 +1,41 @@
 import { Link } from "react-router-dom";
+import LoginImage from "../assets/images/login-icon.png";
+import LogoutImage from "../assets/images/logout-icon.png";
+import "../style/Navbar.css";
 
 function Navbar({ user }) {
 
   const API_BASE_URL = 'http://localhost:3000';
 
   return (
-    <nav style={{ display: 'flex', alignItems: 'center', gap: '15px', padding: '10px' }}>
-      <Link to="/">Home</Link>
-      <Link to="/about">About</Link>
-      <Link to="/search">Search</Link>
-      <Link to="/shelves">Shelves</Link>
-      <Link to="/dashboard">Dashboard</Link>
+    <nav>
+      <div className="nav-links">
+        <Link to="/">Home</Link>
+        <Link to="/search">Search</Link>
+        <Link to="/shelves">Shelves</Link>
+        <Link to="/dashboard">Dashboard</Link>
+      </div>
 
-      {!user ? (
-        <button 
+      <div className="nav-links">
+        {!user ? (
+        <img 
+          className="icon-image"
+          src={LoginImage} 
+          alt="Login"
           onClick={() => window.location.href = `${API_BASE_URL}/auth/google`}
-          style={buttonStyle}
-        >
-          Login with Google
-        </button>
+        />
       ) : (
-        <button 
+        <img 
+          className="icon-image"
+          src={LogoutImage} 
+          alt="Logout"
           onClick={() => window.location.href = `${API_BASE_URL}/auth/logout`}
-          style={{ ...buttonStyle, backgroundColor: '#555' }}
-        >
-          Logout
-        </button>
+        />
       )}
+      </div>
+
     </nav>
   );
 }
-
-const buttonStyle = {
-  backgroundColor: '#4285F4',
-  color: 'white',
-  padding: '10px 20px',
-  border: 'none',
-  borderRadius: '5px',
-  cursor: 'pointer',
-  fontWeight: 'bold',
-  marginLeft: 'auto' 
-};
 
 export default Navbar;

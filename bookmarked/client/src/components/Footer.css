@@ -2,22 +2,22 @@
     text-align: center;
     margin: 150px auto 50px;
     padding: 50px 0;
-    max-width: 85%;
     border-radius: 60px;
-    background-color: var(--text-black);
+    background-color: var(--primary-blue);
 }
 
 .footer p {
     color: var(--text-white);
-    font-size: 12px;
+    margin: 0;
+    font-size: clamp(10px, 1.5vw, 16px);
     text-transform: uppercase;
 }
 
 .footer h3 {
     color: var(--text-white);
     font-family: 'New Icon';
-    font-size: 50px;
-    margin: 40px 0 40px 0;
+    font-size: clamp(25px, 8vw, 80px);
+    margin: 0 0 -15px;
 }
 
 .footer img {
@@ -26,15 +26,20 @@
 }
 
 .footer-links {
-    gap: 10px;
+    gap: 5px;
     display: flex;
     flex-direction: column;
-    text-decoration: none;
 }
 
 .footer-links a {
     color: var(--text-white);
+    font-size: clamp(10px, 1.5vw, 16px);
     text-decoration: none;
     text-transform: uppercase;
+}
+
+.footer-links a:hover {
+    transform: scale(1.2);
+    transition: transform 0.3s ease;
 }
 

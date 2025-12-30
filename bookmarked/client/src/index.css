@@ -1,8 +1,10 @@
 :root {
-  --background: #fcebeb;
-  --text-black: #000000;
+  --background: #f8e1e6;
+  --text-black: #366baa;
   --text-white: #ffffff;
   --text-grey: #7a7a7a;
+
+  --primary-blue: #366baa;
 
   --pastel-purple: #98a2c4;
   --pastel-orange: #e7c79a;
@@ -33,86 +35,28 @@
 body {
   margin: 0;
   font-family: 'Glacial Indifference', Arial, Helvetica, sans-serif;
-  font-size: 15px;
+  font-size: 20px;
   line-height: 2;
   background-color: var(--background);
   color: var(--text-black);
 }
 
 
-.website-container {
-  max-width: 85%;
+.container {
+  max-width: 1280px;
   margin: 0 auto;
-  text-align: center;  
-}
-
-.hero-container {
-  margin-top: 160px;
-  display: flex;
-  flex-direction: column;
-  gap: 0px;
-}
-
-.hero-container h1{
-  margin: 0;
-  line-height: 0.8;
-  font-size: 14.2vw;
-  width: 100%;         
-}
-
-.hero-container img {
-  width: 100%;         
+  text-align: center; 
 }
 
 h1 {
   font-family: 'New Icon';
 }
 
-.tagline {
-  font-size: 45px;
+h2 {
+  font-family: 'Glacial Indifference Bold', Arial, Helvetica, sans-serif;
+  font-size: clamp(1rem, 4.5vw, 5rem);
+  line-height: 1;
 }
 
-#arrow-image {
-  width: 20vw;
-}
 
-#arrow-image:hover {
-  transform: scale(1.5);
-  transition: transform 0.3s ease;
-}
 
-nav {
-  display: flex;
-  justify-content: center;
-  margin: 50px 0 50px 0;
-  gap: 50px;
-}
-
-nav a {
-  padding: 10px 15px;
-  color: var(--text-black);
-  text-decoration: none;
-  text-transform: uppercase;
-}
-
-nav a:hover {
-  background-color: var(--text-black);
-  border-radius: 25px;
-  color: var(--text-white);
-}
-
-.about-container {
-  display: flex;
-  flex-direction: row;
-  gap: 50px;
-
-}
-
-.about-image {
-  height: 30vw;
-}
-
-.about-text p {
-  text-align: justify;
-  font-size: 16px;
-}

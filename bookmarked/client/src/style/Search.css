@@ -1,0 +1,199 @@
+.container {
+    font-family: 'Glacial Indifference', Arial, Helvetica, sans-serif;
+}
+
+.section-title {
+    text-align: left;
+    font-size: clamp(2rem, 5vw, 3rem);
+    margin-bottom: 0;
+}
+
+hr {
+    border: none; 
+    height: 2px; 
+    background-color: var(--primary-blue); 
+}
+
+.search-controls {
+    display: flex;
+    justify-content: space-between;  
+    margin: 30px 0 50px;
+}
+
+.search-controls select {
+    font-family: 'Glacial Indifference', Arial, Helvetica, sans-serif;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 50px;
+    font-size: 15px;
+    background-color: var(--primary-blue);
+    color: var(--text-white);
+    appearance: none;
+
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 20px center; 
+    background-size: 16px;
+}
+
+.genre-filters select:hover {
+    transform: scale(1.1);
+    transition: transform 0.3s;
+}
+
+.genre-filters select:focus {
+    outline: none;
+}
+
+.search-input-wrapper {
+    display: flex;
+    gap: 5px;
+    flex-direction: row;
+    align-items: center;
+    width: 50%;
+}
+
+.search-controls input {
+    padding: 10px 15px 10px 15px;
+    border: 2px solid var(--primary-blue);
+    border-radius: 50px;
+    width: 100%;
+    outline: none;
+    font-size: 15px;
+    color: var(--text-grey);
+}
+
+
+
+
+
+.books-container {
+    display: grid;
+    gap: 30px;
+    grid-template-columns: repeat(4, 1fr);   
+}
+
+.book-card {
+    height: 480px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.book-cover-wrapper:hover {
+    transform: scale(1.05);
+    transform: rotate(-2.5deg);
+    transition: transform 0.5s;
+}
+
+.book-card img {
+    height: 100%; 
+    max-width: 180px;
+    object-fit: contain; 
+    
+}
+
+.book-cover-wrapper { 
+    height: 250px;
+    width: 180px;
+    padding: 50px 20px 0;
+    border-radius: 100px;
+    background-size: cover;
+    border: 2px solid var(--primary-blue);
+}
+
+.book-details {
+    padding: 15px 0 0 0;
+    display: flex;
+    flex-direction: column;
+    text-transform: uppercase;
+}
+
+.books-container a {
+    text-decoration: none;
+}
+
+.book-card h3 {
+    color: var(--primary-blue);
+    font-family: 'Glacial Indifference Bold', Arial, Helvetica, sans-serif;
+    font-size: 20px;
+    font-weight: bold;
+    margin: 5px 0 0;
+    line-height: 1;
+}
+
+.book-card p {
+    color: var(--primary-blue);
+    text-decoration: none;
+    padding: 0 15px;
+    margin-top: 8px;
+    line-height: 1.2;
+    font-style: italic;
+    font-size: 13px;
+}
+
+.no-cover {
+    width: 100%;
+    height: 180px;
+    background-color: var(--text-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-grey);
+}
+
+
+
+.pagination {
+    margin-top: 100px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    align-items: center;
+}
+
+.pagination button {
+    font-family: 'Glacial Indifference', Arial, Helvetica, sans-serif;
+    font-size: 1rem;
+    color: var(--primary-blue);
+    margin: 0 5px;
+    padding: 10px 15px;
+    border-radius: 50px;
+    border: 2px solid var(--background);
+    background: none;
+    cursor: pointer;
+}
+
+.pagination button:hover {
+    transform: scale(1.5);
+    transition: transform 0.2s;
+}
+
+.pagination button:disabled {
+    cursor: not-allowed;
+}
+
+.pagination button.active {
+    background: var(--primary-blue);
+    color: var(--text-white);
+    border-color: var(--primary-blue);
+}
+
+.no-results {
+    grid-column: 1 / -1;
+    text-align: center;
+    font-size: 1rem;
+    color: var(--text-grey);
+}
+
+.header-image {
+    width: 45%;
+    padding-bottom: 30px;
+}
+
+@media (max-width: 1140px) {
+    .books-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}

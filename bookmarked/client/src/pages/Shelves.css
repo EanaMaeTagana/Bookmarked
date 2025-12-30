@@ -1,4 +1,4 @@
-/* --- PAGE LAYOUT --- */
+/* 
 .shelves-container {
   padding: 40px;
   max-width: 1200px;
@@ -6,7 +6,7 @@
   font-family: 'Times New Roman', serif;
 }
 
-/* --- HEADERS --- */
+/* 
 .shelf-section h2 {
   text-transform: uppercase;
   border-bottom: 2px solid #000;
@@ -16,13 +16,13 @@
   font-size: 1.5rem;
 }
 
-/* --- GRID SYSTEM --- */
+/* 
 .shelf-grid {
   display: flex;
   flex-wrap: wrap;
   gap: 40px;
   margin-top: 30px;
-  justify-content: flex-start; /* Aligns items to the left */
+  justify-content: flex-start;
 }
 
 .book-card {
@@ -30,9 +30,9 @@
   text-align: center;
 }
 
-/* --- IMAGE CONTAINER (Crucial for Overlay) --- */
+
 .image-container {
-  position: relative; /* This holds the absolute overlay inside */
+  position: relative; 
   width: 150px;
   height: 230px;
   border-radius: 5px;
@@ -50,28 +50,28 @@
   height: 100%;
   object-fit: cover;
   display: block;
-}
+} */
 
-/* --- THE OVERLAY (Dark Box on Hover) --- */
+
 .delete-overlay {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.7); /* Dark see-through black */
+  background-color: rgba(0, 0, 0, 0.7); 
   
-  display: flex;       /* Centers buttons */
-  flex-direction: column; /* Stacks buttons vertically */
+  display: flex;      
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 15px;           /* Space between buttons */
+  gap: 15px;       
   
-  opacity: 0;          /* Hidden by default */
+  opacity: 0;        
   transition: opacity 0.3s ease;
 }
 
-/* Show Overlay when hovering the IMAGE CONTAINER */
+
 .image-container:hover .delete-overlay {
   opacity: 1;
 }

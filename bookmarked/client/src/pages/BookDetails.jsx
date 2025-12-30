@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import Header from "../components/Header.jsx";
 import HorizontalLine from "../components/HorizontalLine.jsx";  
 import axios from "axios";
-import "./BookDetails.css"; 
 
 function BookDetails() {
   const { olid } = useParams();

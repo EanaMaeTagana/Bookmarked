@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import AdminDashboard from './pages/AdminDashboard';
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
-import About from "./pages/About";
 import Search from "./pages/Search";
 import Shelves from "./pages/Shelves";
 import Dashboard from "./pages/Dashboard";
@@ -36,23 +35,19 @@ function App() {
 
   return (
     <Router>
-      <div className="website-container">
-        <Navbar user={user} />
+      <Navbar user={user} />
         
-        <Routes>
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/search" element={<Search />} />
-          <Route path="/book/:olid" element={<BookDetails />} />
-          <Route path="/shelves" element={<Shelves />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+      <Routes>
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/search" element={<Search />} />
+        <Route path="/book/:olid" element={<BookDetails />} />
+        <Route path="/shelves" element={<Shelves />} />
+        <Route path="/dashboard" element={<Dashboard />} />
           
-          {/* 👇 THE NEW ROUTE FOR DELETED/NEW USERS */}
-          <Route path="/create-profile" element={<CreateProfile />} />
-        </Routes>
-      </div>
-      <Footer /> 
+        <Route path="/create-profile" element={<CreateProfile />} />
+      </Routes>
+    <Footer /> 
     </Router>
   );
 }
