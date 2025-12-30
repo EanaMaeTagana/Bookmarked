@@ -1,18 +1,32 @@
 import { useEffect, useState } from 'react';
-import './Shelves.css';
+import Header from "../components/Header.jsx";
+import HorizontalLine from "../components/HorizontalLine.jsx";
+import BackgroundImage from "../assets/images/background-image.png"; 
+import EditImage from "../assets/images/edit-icon.png"; 
+import '../style/Shelves.css'; 
+
+import HeartFilled from "../assets/images/full-heart.png"; 
+import HeartEmpty from "../assets/images/empty-heart.png";   
+import TrashIcon from "../assets/images/trash-icon.png";     
 
 const Shelves = () => {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Modal State
+  // --- BOOK MODAL STATE ---
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBook, setEditingBook] = useState(null);
   const [selectedShelf, setSelectedShelf] = useState(""); 
   const [customShelfName, setCustomShelfName] = useState(""); 
 
+  // --- SHELF EDIT MODAL STATE ---
+  const [isShelfModalOpen, setIsShelfModalOpen] = useState(false);
+  const [targetShelf, setTargetShelf] = useState(""); 
+  const [newShelfName, setNewShelfName] = useState(""); 
+
   const defaultShelves = ["Currently Reading", "Want to Read", "Read"];
 
+  // --- FETCH DATA ---
   useEffect(() => {
     fetchBooks();
   }, []);
@@ -29,80 +43,45 @@ const Shelves = () => {
     }
   };
 
-  // --- 1. DELETE BOOK (Single Book) ---
-  const handleDelete = async (id) => {
-    if(!confirm("Remove this book from your library?")) return;
-    try {
-      await fetch(`http://localhost:3000/api/bookshelf/${id}`, { method: 'DELETE', credentials: 'include' });
-      setBooks(books.filter(b => b._id !== id));
-    } catch (err) { 
-      console.error(err); 
-    }
-  };
+  // ==============================
+  //       BOOK ACTIONS
+  // ==============================
 
-  // --- 2. DELETE SHELF (Custom Shelf Only) ---
-  const handleDeleteShelf = async (shelfName) => {
-    const confirmMessage = `Are you sure you want to delete the shelf "${shelfName}"?\n\nAll books in this shelf will be moved to 'Want to Read'.`;
-    if (!confirm(confirmMessage)) return;
+  const handleDeleteBook = async () => {
+    if (!editingBook) return;
+    if(!confirm(`Remove "${editingBook.title}" from your library?`)) return;
 
     try {
-      const booksInShelf = books.filter(b => b.shelf === shelfName);
-
-      const updatedBooks = books.map(b => 
-        b.shelf === shelfName ? { ...b, shelf: "Want to Read" } : b
-      );
-      setBooks(updatedBooks);
-
-      await Promise.all(booksInShelf.map(book => 
-        fetch(`http://localhost:3000/api/bookshelf/${book._id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ shelf: "Want to Read" }),
-          credentials: 'include'
-        })
-      ));
-
-    } catch (err) {
-      console.error("Error deleting shelf:", err);
-      alert("Failed to delete shelf properly. Refreshing...");
-      fetchBooks(); 
-    }
+      await fetch(`http://localhost:3000/api/bookshelf/${editingBook._id}`, { method: 'DELETE', credentials: 'include' });
+      setBooks(books.filter(b => b._id !== editingBook._id));
+      setIsModalOpen(false); 
+    } catch (err) { console.error(err); }
   };
 
-  // --- 3. TOGGLE HEART (Top Pick) ---
-  const handleToggleHeart = async (book) => {
-    const newStatus = !book.isTopPick;
+  const handleToggleHeart = async () => {
+    if (!editingBook) return;
+    const newStatus = !editingBook.isTopPick;
+
     const updatedBooks = books.map(b => 
-      b._id === book._id ? { ...b, isTopPick: newStatus } : b
+      b._id === editingBook._id ? { ...b, isTopPick: newStatus } : b
     );
     setBooks(updatedBooks);
+    setEditingBook({ ...editingBook, isTopPick: newStatus });
 
     try {
-      await fetch(`http://localhost:3000/api/bookshelf/${book._id}`, {
+      await fetch(`http://localhost:3000/api/bookshelf/${editingBook._id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ isTopPick: newStatus }),
         credentials: 'include'
       });
-    } catch (err) {
-      console.error("Heart Error:", err);
-      fetchBooks(); 
-    }
-  };
-
-  // --- 4. MOVE MODAL LOGIC ---
-  const openMoveModal = (book) => {
-    setEditingBook(book);
-    setSelectedShelf(book.shelf); 
-    setCustomShelfName(""); 
-    setIsModalOpen(true);
+    } catch (err) { fetchBooks(); }
   };
 
   const handleSaveShelf = async () => {
     if (!editingBook) return;
 
     let finalShelfName = selectedShelf;
-    
     if (selectedShelf === "custom") {
       if (!customShelfName.trim()) return alert("Please enter a shelf name");
       finalShelfName = customShelfName.trim();
@@ -121,136 +100,270 @@ const Shelves = () => {
         body: JSON.stringify({ shelf: finalShelfName }),
         credentials: 'include'
       });
+    } catch (err) { fetchBooks(); }
+  };
 
+  const openEditModal = (book) => {
+    setEditingBook(book);
+    setSelectedShelf(book.shelf); 
+    setCustomShelfName(""); 
+    setIsModalOpen(true);
+  };
+
+  // ==============================
+  //       SHELF ACTIONS
+  // ==============================
+
+  const openShelfModal = (shelfName) => {
+    setTargetShelf(shelfName);
+    setNewShelfName(shelfName);
+    setIsShelfModalOpen(true);
+  };
+
+  // 1. DELETE SHELF
+  const handleDeleteShelf = async () => {
+    const confirmMessage = `Are you sure you want to delete the shelf "${targetShelf}"?\n\nAll books in this shelf will be moved to 'Want to Read'.`;
+    if (!confirm(confirmMessage)) return;
+
+    try {
+      const booksInShelf = books.filter(b => b.shelf === targetShelf);
+      
+      const updatedBooks = books.map(b => 
+        b.shelf === targetShelf ? { ...b, shelf: "Want to Read" } : b
+      );
+      setBooks(updatedBooks);
+      setIsShelfModalOpen(false); 
+
+      await Promise.all(booksInShelf.map(book => 
+        fetch(`http://localhost:3000/api/bookshelf/${book._id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ shelf: "Want to Read" }),
+          credentials: 'include'
+        })
+      ));
     } catch (err) {
-      console.error("Failed to move book", err);
+      console.error("Error deleting shelf:", err);
       fetchBooks(); 
     }
   };
 
-  // --- CALCULATE SHELVES ---
+  // 2. RENAME SHELF
+  const handleRenameShelf = async () => {
+    if (!newShelfName.trim()) return alert("Shelf name cannot be empty");
+    if (newShelfName === targetShelf) return setIsShelfModalOpen(false); 
+
+    try {
+      const booksInShelf = books.filter(b => b.shelf === targetShelf);
+
+      const updatedBooks = books.map(b => 
+        b.shelf === targetShelf ? { ...b, shelf: newShelfName.trim() } : b
+      );
+      setBooks(updatedBooks);
+      setIsShelfModalOpen(false);
+
+      await Promise.all(booksInShelf.map(book => 
+        fetch(`http://localhost:3000/api/bookshelf/${book._id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ shelf: newShelfName.trim() }),
+          credentials: 'include'
+        })
+      ));
+
+    } catch (err) {
+      console.error("Error renaming shelf:", err);
+      fetchBooks();
+    }
+  };
+
   const usedShelves = [...new Set(books.map(b => b.shelf))];
   const allShelves = [...new Set([...defaultShelves, ...usedShelves])];
 
   if (loading) return <h2>Loading...</h2>;
 
   return (
-    <div className="shelves-container">
-      <h1 style={{ textAlign: 'center', fontSize: '3rem', margin: '20px 0' }}>BOOKMARKED</h1>
+    <div className="container">
+      <Header />
+      <HorizontalLine />
 
-      {allShelves.map(shelfName => {
-        const shelfBooks = books.filter(b => b.shelf === shelfName);
-        
-        if (shelfBooks.length === 0 && !defaultShelves.includes(shelfName)) return null; 
+      <div className="page-container">
+        {allShelves.map(shelfName => {
+          const shelfBooks = books.filter(b => b.shelf === shelfName);
+          
+          if (shelfBooks.length === 0 && !defaultShelves.includes(shelfName)) return null; 
+          const isCustomShelf = !defaultShelves.includes(shelfName);
 
-        const isCustomShelf = !defaultShelves.includes(shelfName);
-
-        return (
-          <div key={shelfName} className="shelf-section">
-            
-            {/* --- SHELF HEADER WITH DELETE BUTTON --- */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '15px', borderBottom: '2px solid black', paddingBottom: '5px', marginTop: '40px' }}>
-              <h2 style={{ margin: 0, border: 'none' }}>{shelfName.toUpperCase()}</h2>
+          return (
+            <div className="shelf-container" key={shelfName}>
               
-              {isCustomShelf && (
-                <button 
-                  onClick={() => handleDeleteShelf(shelfName)}
-                  style={{ 
-                    background: 'none', 
-                    border: '1px solid #ff4d4d', 
-                    color: '#ff4d4d', 
-                    borderRadius: '20px', 
-                    padding: '5px 10px', 
-                    cursor: 'pointer', 
-                    fontSize: '0.8rem',
-                    fontWeight: 'bold'
-                  }}
-                  title="Delete Shelf (Moves books to Want to Read)"
-                >
-                  ✖ DELETE SHELF
-                </button>
-              )}
-            </div>
+              <div>
 
-            <div className="shelf-grid">
-              {shelfBooks.length > 0 ? shelfBooks.map((book) => (
-                <div key={book._id} className="book-card">
-                  
-                  <div className="image-container" style={{ position: 'relative' }}>
-                    <img 
-                      src={book.coverImage || "https://placehold.co/128x190"} 
-                      alt={book.title}
-                      className="book-cover"
-                      onError={(e) => { e.target.src = "https://placehold.co/128x190"; }}
-                    />
-                    
-                    <div className="delete-overlay">
-                      <button className="icon-btn" title="Move to Shelf" onClick={() => openMoveModal(book)}>
-                        📂
-                      </button>
-                      <button className="icon-btn" title="Delete Book" onClick={() => handleDelete(book._id)}>
-                        🗑
-                      </button>
+                <div className="shelf-information">
 
-                      <button 
-                         className="icon-btn" 
-                         onClick={() => handleToggleHeart(book)}
-                         title={book.isTopPick ? "Remove from Top 4" : "Add to Top 4"}
-                         style={{ color: book.isTopPick ? '#ff4d4d' : 'white', fontWeight: 'bold' }} 
-                       >
-                         {book.isTopPick ? '♥' : '♡'}
-                       </button>
+                  <h1 className="shelf-name">{shelfName}</h1>
+
+                  {isCustomShelf && (
+                      <img 
+                      className="icon-image" 
+                      onClick={() => openShelfModal(shelfName)} 
+                      title="Edit Shelf Name or Delete" 
+                      src={EditImage} 
+                      alt="Edit Shelf" />
+                  )}
+
+                </div>
+
+                <hr />
+
+              </div>
+
+              {shelfBooks.length > 0 ? (
+                
+                <div className="books-container">
+                  {shelfBooks.map((book) => (
+                    <div key={book._id} className="book-card">
+                      
+                      <div 
+                        className="book-cover-wrapper"
+                        style={{ backgroundImage: `url(${BackgroundImage})` }}
+                      >
+                        <img 
+                          src={book.coverImage || "https://placehold.co/128x190"} 
+                          alt={book.title}
+                          onError={(e) => { e.target.src = "https://placehold.co/128x190"; }}
+                        />
+                      </div>
+                      
+                      <div className="book-details">
+                        <h3>{book.title}</h3>
+                        <p>{book.authors?.[0] || "Unknown"}</p>
+                      </div>
+
+                      <img 
+                        className="icon-image" 
+                        onClick={() => openEditModal(book)}
+                        title="Edit Book Shelf" 
+                        src={EditImage}
+                        alt="Edit Book"
+                      />
 
                     </div>
-                  </div>
-                  
-                  <div className="book-info">
-                    <h3>{book.title}</h3>
-                    <p>{book.authors?.[0] || "Unknown"}</p>
-                  </div>
+                  ))}
                 </div>
-              )) : <p style={{color: '#888', fontStyle: 'italic', marginTop: '20px'}}>Empty shelf</p>}
-            </div>
-          </div>
-        );
-      })}
 
-      {/* --- MOVE MODAL --- */}
-      {isModalOpen && (
+              ) : (
+                
+                <p className="empty-shelf">
+                  This shelf is empty.
+                </p>
+
+              )}
+            </div>
+          );
+        })}
+
+            <HorizontalLine />
+      </div>
+
+      {/* --- MODAL 1: BOOK EDITING --- */}
+      {isModalOpen && editingBook && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <h3>Move "{editingBook.title}"</h3>
-            <p>Select a shelf or create a new one:</p>
+            <h3>Editing "{editingBook.title}"</h3>
+            
+            <div className="modal-section">
+                <label>Move this book to:</label>
+                <select 
+                  value={selectedShelf} 
+                  onChange={(e) => setSelectedShelf(e.target.value)}
+                >
+                  {allShelves.map(s => <option key={s} value={s}>{s}</option>)}
+                  <option value="custom">+ Create a New Shelf</option>
+                </select>
 
-            <select 
-              value={selectedShelf} 
-              onChange={(e) => setSelectedShelf(e.target.value)}
-            >
-              {allShelves.map(s => <option key={s} value={s}>{s}</option>)}
-              <option value="custom">+ Create New Shelf...</option>
-            </select>
+                {selectedShelf === "custom" && (
+                <input 
+                    type="text" 
+                    placeholder="Enter new shelf name..." 
+                    autoFocus
+                    value={customShelfName}
+                    onChange={(e) => setCustomShelfName(e.target.value)}
+                />
+                )}
+            </div>
 
-            {selectedShelf === "custom" && (
-              <input 
-                type="text" 
-                placeholder="Enter new shelf name..." 
-                autoFocus
-                value={customShelfName}
-                onChange={(e) => setCustomShelfName(e.target.value)} 
-              />
-            )}
+            <div className="modal-actions-list">
+              
+              {/* HEART ICON BUTTON */}
+              <img 
+                src={editingBook.isTopPick ? HeartFilled : HeartEmpty} 
+                  onClick={handleToggleHeart}
+                  alt="Heart" 
+                  className="icon-image"
+                  title={editingBook.isTopPick ? "Remove from Favorites" : "Add to Favorites"}/>
 
-            <div className="modal-actions">
-              <button onClick={() => setIsModalOpen(false)} style={{padding:'10px 20px'}}>Cancel</button>
-              <button 
-                onClick={handleSaveShelf}
-                style={{padding:'10px 20px', background: 'black', color: 'white', border: 'none'}}
-              >
-                Save Move
-              </button>
+              {/* TRASH ICON BUTTON */}
+              <img 
+                src={TrashIcon} 
+                onClick={handleDeleteBook}
+                className="icon-image"
+                title="Delete Book"
+                alt="Delete"/>
+
+            </div>
+
+            <hr />
+
+            <div className="modal-footer">
+
+              <button className="cancel-button" onClick={() => setIsModalOpen(false)}>Cancel</button>
+
+              <button className="button" onClick={handleSaveShelf}>Save Changes</button>
+
             </div>
           </div>
         </div>
+      )}
+
+      {/* --- MODAL 2: SHELF EDITING --- */}
+      {isShelfModalOpen && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3>Editing Shelf: "{targetShelf}"</h3>
+            
+            <div className="modal-section">
+              <label>Rename this shelf to:</label>
+              <input 
+                type="text" 
+                value={newShelfName} 
+                onChange={(e) => setNewShelfName(e.target.value)}/>
+            </div>
+
+            <div className="modal-actions-list shelf-modal">
+
+              <img 
+                src={TrashIcon} 
+                onClick={handleDeleteShelf}
+                className="icon-image"
+                title="Delete Shelf"
+                alt="Delete"/>
+
+              <p>(Books will be moved to 'Want to Read')</p>
+
+            </div>
+
+            <hr />
+
+            <div className="modal-footer">
+              <button className="cancel-button" onClick={() => setIsShelfModalOpen(false)}>Cancel</button>
+              <button className="button" onClick={handleRenameShelf}>Save Name</button>
+            </div>
+
+          </div>
+
+        </div>
+
       )}
 
     </div>

@@ -10,6 +10,9 @@
   --pastel-orange: #e7c79a;
   --pastel-blue: #98c0d3;
   --pastel-red: #d7b1a3;
+
+  margin: 0;
+  padding: 0;
 }
 
 @font-face {
@@ -33,7 +36,6 @@
 }
 
 body {
-  margin: 0;
   font-family: 'Glacial Indifference', Arial, Helvetica, sans-serif;
   font-size: 20px;
   line-height: 2;
@@ -56,6 +58,29 @@ h2 {
   font-family: 'Glacial Indifference Bold', Arial, Helvetica, sans-serif;
   font-size: clamp(1rem, 4.5vw, 5rem);
   line-height: 1;
+}
+
+.button {
+  font-size: 18px;
+  display: inline-block;   
+  background-color: var(--primary-blue); 
+  color: var(--text-white);
+  text-decoration: none;      
+  padding: 8px 20px;     
+  border-radius: 50px;       
+  border: 2px solid var(--primary-blue);  
+  transition: all 0.3s ease; 
+}
+
+.button:hover {
+  background-color: transparent;
+  color: var(--primary-blue);
+  transform: scale(1.1); 
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);    
+}
+
+.page-container {
+  margin-bottom: 100px;
 }
 
 

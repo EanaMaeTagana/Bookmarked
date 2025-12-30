@@ -34,8 +34,8 @@ function Home() {
             <h2>Ditch manual diaries—go fully digital.</h2>
             <p>Set your goals, track every read, <br />and save moments you love. All in one place.</p>
             <Header />
-            <Link to="/search" className="CTA-button">
-                <p>Get Started</p>
+            <Link to="/search" className="button">
+                Get Started
             </Link>
         </div>
 

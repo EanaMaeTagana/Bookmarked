@@ -63,13 +63,10 @@ hr {
     color: var(--text-grey);
 }
 
-
-
-
-
 .books-container {
+    margin-top: 100px;
     display: grid;
-    gap: 30px;
+    gap: 20px;
     grid-template-columns: repeat(4, 1fr);   
 }
 
@@ -78,7 +75,6 @@ hr {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
 }
 
 .book-cover-wrapper:hover {
@@ -101,6 +97,7 @@ hr {
     border-radius: 100px;
     background-size: cover;
     border: 2px solid var(--primary-blue);
+    box-shadow: 5px 5px 0px rgba(54, 107, 170, 0.2)
 }
 
 .book-details {
@@ -146,7 +143,6 @@ hr {
 
 
 .pagination {
-    margin-top: 100px;
     display: flex;
     justify-content: center;
     gap: 20px;

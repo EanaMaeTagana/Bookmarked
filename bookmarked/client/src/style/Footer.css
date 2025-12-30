@@ -11,6 +11,7 @@
     margin: 0;
     font-size: clamp(10px, 1.5vw, 16px);
     text-transform: uppercase;
+    text-align: center;
 }
 
 .footer h3 {
@@ -26,6 +27,8 @@
 }
 
 .footer-links {
+    margin: 10px auto;
+    max-width: fit-content;
     gap: 5px;
     display: flex;
     flex-direction: column;

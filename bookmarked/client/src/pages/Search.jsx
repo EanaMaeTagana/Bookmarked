@@ -77,69 +77,74 @@ function Search() {
 
       <Header />
       <HorizontalLine />
-      <h1 className="section-title">Discover</h1>
-      <hr />
-      
-      <div className="search-controls"> 
+      <div className="page-container">
+        <h1 className="section-title">Discover</h1>
+        <hr />
+        
+        <div className="search-controls"> 
 
-        <div className="genre-filters">
-          <select value={category} onChange={(e) => setCategory(e.target.value)}> 
-            <option value="fiction">ALL</option> 
-            <option value="romance">ROMANCE</option> 
-            <option value="mystery">MYSTERY</option> 
-            <option value="fantasy">FANTASY</option> 
-            <option value="nonfiction">NON-FICTION</option> 
-          </select> 
-        </div>
+          <div className="genre-filters">
+            <select value={category} onChange={(e) => setCategory(e.target.value)}> 
+              <option value="fiction">ALL</option> 
+              <option value="romance">ROMANCE</option> 
+              <option value="mystery">MYSTERY</option> 
+              <option value="fantasy">FANTASY</option> 
+              <option value="nonfiction">NON-FICTION</option> 
+            </select> 
+          </div>
 
-        <div className="search-input-wrapper">
-          <input 
-            type="text" 
-            placeholder="Search books by title or author..." 
-            value={query} 
-            onChange={(e) => setQuery(e.target.value)} 
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') handleSearchSubmit(); 
-            }}
-          />
-          <img className="icon-image" onClick={handleSearchSubmit}
-            src={SearchImage}  
-            alt="Search"
-          />
-        </div>
+          <div className="search-input-wrapper">
+            <input 
+              type="text" 
+              placeholder="Search books by title or author..." 
+              value={query} 
+              onChange={(e) => setQuery(e.target.value)} 
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleSearchSubmit(); 
+              }}
+            />
+            <img className="icon-image" onClick={handleSearchSubmit}
+              src={SearchImage}  
+              alt="Search"
+            />
+          </div>
 
-      </div> 
+        </div> 
 
-      <div className="books-container"> 
-        {books.length > 0 ? ( 
-          books.map((book, index) => ( 
-            <Link 
-              to={`/book/${book.key.replace("/works/", "")}`} 
-              key={book.key || index} 
-              className="book-card"
-            > 
-              <div 
-                className="book-cover-wrapper"
-                style={{ backgroundImage: `url(${BackgroundImage})` }}
-              >
-                {book.cover_i ? (
-                  <img src={`https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg`} alt={book.title} /> 
-                ) : (
-                  <div className="no-cover">No Image</div>
-                )} 
-              </div> 
-              <div className="book-details"> 
-                  <h3>{book.title}</h3> 
-                  <p>{(book.author_name || []).join(", ")}</p> 
-              </div>
-            </Link>
-          )) 
-        ) : ( 
-          <div className="no-results">No results found</div>
-        )} 
-      </div> 
+        <div className="books-container"> 
+          {books.length > 0 ? ( 
+            books.map((book, index) => ( 
+              <Link 
+                to={`/book/${book.key.replace("/works/", "")}`} 
+                key={book.key || index} 
+                className="book-card"
+              > 
+                <div 
+                  className="book-cover-wrapper"
+                  style={{ backgroundImage: `url(${BackgroundImage})` }}>
+                
+                  {book.cover_i ? (
+                    <img src={`https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg`} alt={book.title} /> 
+                  ) : (
+                    <div className="no-cover">No Image</div>
+                  )} 
+                </div> 
+                <div className="book-details"> 
+                    <h3>{book.title}</h3> 
+                    <p>{(book.author_name || []).join(", ")}</p> 
+                </div>
+              </Link>
+            )) 
+          ) : ( 
+            <div className="no-results">No results found</div>
+          )} 
+        </div> 
 
-      <Pagination page={page} lastPage={lastPage} setPage={setPage} />
+        <Pagination page={page} lastPage={lastPage} setPage={setPage} />
+
+
+      </div>
+      <HorizontalLine />
 
     </div> 
   ); 

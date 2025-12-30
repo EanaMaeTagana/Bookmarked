@@ -21,7 +21,6 @@ const BookshelfSchema = new mongoose.Schema({
   
   // --- DIARY & JOURNAL FIELDS ---
   notes: { type: String, default: '' }, 
-  memorableScene: { type: String, default: '' }, 
   quotes: { type: String, default: '' },
   rating: { type: Number, min: 0, max: 10, default: 0 }, 
   dateRead: { type: Date }, 
