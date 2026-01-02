@@ -1,9 +1,30 @@
-.shelf-container {
-  margin-top: 50px;
+.bounce-message {
+  height: 500px;
+  flex-direction: column;
+  display: flex;    
+  gap: 20px;       
+  justify-content: center; 
+  align-items: center;
 }
 
-.modal-section {
+.bounce-message h2 {
+  font-family: "New Icon";
   margin: 0;
+}
+
+.bounce-message p {
+  color: var(--text-grey);
+  font-style: italic;
+  margin: 0;
+}
+
+.bounce-button {
+  margin-top: 10px;
+  font-family: 'Glacial Indifference', Arial, Helvetica, sans-serif;
+}
+
+.shelf-container {
+  margin-top: 50px;
 }
 
 .modal-overlay {
@@ -90,11 +111,12 @@
 }
 
 .book-card:hover .icon-image {
-    opacity: 1;
-    visibility: visible;
+  opacity: 1;
+  visibility: visible;
 }
 
 .cancel-button {
+  font-family: 'Glacial Indifference', Arial, Helvetica, sans-serif;
   font-size: 18px;
   display: inline-block;   
   background-color: transparent; 

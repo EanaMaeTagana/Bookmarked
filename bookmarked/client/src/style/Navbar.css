@@ -11,10 +11,11 @@ nav {
     font-size: clamp(12px, 1.5vw, 15px);
     display: flex;
     gap: 50px;
+    line-height: 2;
 }
 
 nav a {
-    color: var(--text-black);
+    color: var(--primary-blue);
     text-decoration: none;
     text-transform: uppercase;
     border-bottom: 2px solid var(--background);

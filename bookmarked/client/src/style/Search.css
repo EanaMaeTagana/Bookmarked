@@ -64,22 +64,20 @@ hr {
 }
 
 .books-container {
-    margin-top: 100px;
+    margin: 50px 0;
     display: grid;
     gap: 20px;
     grid-template-columns: repeat(4, 1fr);   
 }
 
 .book-card {
-    height: 480px;
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-.book-cover-wrapper:hover {
-    transform: scale(1.05);
-    transform: rotate(-2.5deg);
+.book-cover-wrapper img:hover {
+    transform: scale(1.1) rotate(-5.5deg);
     transition: transform 0.5s;
 }
 
@@ -93,6 +91,7 @@ hr {
 .book-cover-wrapper { 
     height: 250px;
     width: 180px;
+    margin: 0 auto;
     padding: 50px 20px 0;
     border-radius: 100px;
     background-size: cover;

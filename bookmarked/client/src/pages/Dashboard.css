@@ -1,245 +1,147 @@
-/* --- PAGE BACKGROUND --- */
-.dashboard-container {
-  background-color: #fcebeb; 
-  min-height: 100vh;
-  padding: 40px;
-  font-family: 'Times New Roman', serif;
-  color: #4a6fa5; 
-}
-
-/* --- HEADER --- */
-.dash-header {
-  text-align: center;
-  margin-bottom: 60px;
-}
-
-.top-nav-links {
-  font-family: sans-serif;
-  font-size: 0.7rem;
-  font-weight: bold;
-  letter-spacing: 1px;
-  margin-bottom: 20px;
-  color: #4a6fa5;
-}
-
-.top-nav-links span {
-  margin: 0 15px;
-  cursor: pointer;
-}
-
-.top-nav-links span.active {
-  text-decoration: underline;
-}
-
 .greeting {
-  font-size: 5rem; /* Huge text like "HEY, EANA" */
-  margin: 10px 0 30px;
-  font-weight: normal;
-  letter-spacing: -2px;
-  color: #4a6fa5;
+  font-size: clamp(3rem, 6vw, 10rem);
+  margin: 50px 0 35px;
 }
 
-.stats-pill {
-  border: 2px solid #4a6fa5;
+.account-stats {
+  padding: 25px;
+  width: max-width;
+  border: 2px solid var(--primary-blue);
   border-radius: 50px;
-  padding: 15px 40px;
-  display: inline-flex;
-  gap: 80px;
-  background: white;
-  margin-bottom: 20px;
-  font-family: sans-serif;
-  font-size: 0.8rem;
-  color: #4a6fa5;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  background: var(--text-white);
+  color: var(--primary-blue);
 }
 
-.settings-btn {
-  display: block;
-  margin: 20px auto 0;
-  background: #4a6fa5;
-  color: white;
-  border: none;
-  padding: 8px 20px;
-  border-radius: 20px;
-  font-size: 0.7rem;
-  font-weight: bold;
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.settings-btn:hover {
-  transform: scale(1.05);
-}
-
-/* --- TITLES --- */
-.section-title {
-  font-size: clamp(2rem, 5vw, 3rem);
-}
-
-/* --- TOP 4 (ARCHES) --- */
-.top-four-grid {
-  display: flex;
-  justify-content: center;
-  gap: 40px;
-  flex-wrap: wrap;
-}
-
-.top-book-card {
-  text-align: center;
-  width: 180px;
-}
-
-.arch-frame {
-  width: 100%;
-  height: 240px;
-  /* The Arch Shape */
-  border-top-left-radius: 100px;
-  border-top-right-radius: 100px;
-  overflow: hidden;
-  margin-bottom: 15px;
-  border: 2px solid white; /* Optional white border */
-  box-shadow: 0 10px 20px rgba(74, 111, 165, 0.2);
-}
-
-.arch-frame img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.top-book-card h3 {
-  font-size: 0.9rem;
-  margin: 5px 0;
-  color: #4a6fa5;
-}
-.top-book-card p {
-  font-size: 0.7rem;
+.account-stats p {
+  text-transform: uppercase;
   margin: 0;
-  color: #6a8fb5;
+  font-size: 15px;
+  text-align: left;
 }
 
-/* --- DIVIDER --- */
-.flower-divider {
+.account-stats span {
+  font-family: 'Glacial Indifference Bold', sans-serif;
+}
+
+.stat-left {
+  padding-right: 15px;
+}
+
+.user-settings {
+  margin: 25px 0 50px;
+}
+
+.admin-button {
+  margin-left: 15px;
+  background-color: var(--secondary-red);
+  color: var(--text-white);
+  border: 2px solid var(--secondary-red);
+}
+
+.admin-button:hover {
+  background-color: transparent;
+  color: var(--secondary-red);
+}
+
+.empty-message {
+  color: var(--text-grey);
+  font-size: 25px;
+  font-style: italic;
+  width: 100%;
+  margin-bottom: 100px;
   text-align: center;
-  font-size: 2rem;
-  margin: 60px 0;
-  color: #4a6fa5;
-  letter-spacing: 15px;
 }
 
-/* --- DIARY ENTRIES (BUBBLES) --- */
-.diary-feed {
-  display: flex;
-  flex-direction: column;
-  gap: 40px;
-  max-width: 900px;
-  margin: 0 auto;
-}
-
-.diary-entry-card {
-  position: relative; 
-  background: white;
-  border: 2px solid #4a6fa5;
-  border-radius: 40px; 
-  padding: 30px;
-  display: flex;
-  gap: 30px;
+.diary-masonry-feed {
+  display: flex;       
+  gap: 50px;           
+  margin: 80px 0;
   align-items: flex-start;
-  box-shadow: 5px 5px 0px rgba(74, 111, 165, 0.1);
-  transition: transform 0.2s;
+  width: 100%;
 }
 
-.edit-diary-btn {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: 1px solid #4a6fa5;
-  background: white;
-  color: #4a6fa5;
-  font-size: 1.2rem;
-  cursor: pointer;
-  
+.masonry-column {
+  flex: 1;             
   display: flex;
-  align-items: center;
-  justify-content: center;
-  
-  opacity: 0; /* Hidden by default */
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  flex-direction: column; 
+  gap: 50px;           
 }
 
-/* Show button when hovering the card */
-.diary-entry-card:hover .edit-diary-btn {
-  opacity: 1;
+.diary-card {
+  position: relative;
+  background: var(--text-white);
+  border: 2px solid var(--primary-blue);
+  border-radius: 50px; 
+  padding: 40px;
+  box-sizing: border-box;
+  overflow: hidden;
+  display: block; 
+  width: 100%;
+  transition: all 0.3s ease;
 }
 
-.edit-diary-btn:hover {
-  background: #4a6fa5;
-  color: white;
-  transform: scale(1.1);
+.diary-content-top {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 15px;
 }
 
-.entry-cover img {
-  width: 100px;
-  border-radius: 5px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+.entry-cover img{
+  width: 100%;
 }
 
-.entry-content {
-  flex: 1;
-}
-
-.entry-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin-bottom: 20px;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 10px;
-}
-
-.entry-header h3 {
-  font-size: 1.5rem;
+.entry-title {
+  font-family: 'Glacial Indifference Bold', sans-serif;
+  height: fit-content;
+  font-size: 35px;
+  text-align: left;
+  text-transform: uppercase;
+  line-height: 1;
   margin: 0;
-  color: #4a6fa5;
+  padding: 0;
+}
+
+.entry-notes {
+  text-align: justify;
+  font-size: 18px;
+  margin: 10px 0 0 0;
+  padding: 0;
+  line-height: 1.8;
 }
 
 .entry-date {
-  font-family: sans-serif;
-  color: #888;
-  font-size: 0.9rem;
-}
-
-.diary-block {
-  margin-bottom: 15px;
-}
-
-.diary-block strong {
-  display: block;
-  font-family: sans-serif;
-  font-size: 0.75rem;
-  font-weight: bold;
-  margin-bottom: 5px;
-  color: #4a6fa5;
-  opacity: 0.7;
-}
-
-.diary-block p {
-  margin: 0;
+  font-size: 20px;
+  margin: 10px 0 0 0;  
+  text-align: left;
   font-style: italic;
-  line-height: 1.5;
-  color: #555;
 }
 
-.diary-rating {
+.diary-content-bottom {
+  text-align: justify;
+  font-size: 18px;
   margin-top: 20px;
-  font-family: sans-serif;
-  font-weight: bold;
-  color: #4a6fa5;
 }
 
+strong {
+  font-family: 'Glacial Indifference Bold', sans-serif;
+  text-transform: uppercase;
+}
 
+.diary-card .edit-diary-button {
+  position: absolute;
+  top: 50%;
+  left: 46%;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease; 
+  transform: scale(1.5);
+  border-radius: 100px;
+  border: 10px solid var(--text-white); 
+}
 
-
+.diary-card:hover .edit-diary-button {
+  opacity: 1;
+  visibility: visible;
+}

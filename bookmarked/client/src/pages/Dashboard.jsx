@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import BackgroundImage from "../assets/images/background-image.png"; 
+import HorizontalLine from "../components/HorizontalLine.jsx";
+import EditImage from "../assets/images/edit-icon.png"; 
 import './Dashboard.css';
 
 const Dashboard = () => {
@@ -9,20 +12,19 @@ const Dashboard = () => {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // --- PROFILE EDIT STATE ---
+  // --- MODAL STATE ---
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [profileForm, setProfileForm] = useState({
     nickname: "", 
     bio: "",
     favoriteGenre: "",
-    goal: 100
+    goal: 0 
   });
 
-  // --- DIARY EDIT STATE ---
   const [isDiaryModalOpen, setIsDiaryModalOpen] = useState(false);
   const [editingEntry, setEditingEntry] = useState(null); 
   const [diaryForm, setDiaryForm] = useState({
-    memorableScene: "",
+    notes: "",
     quotes: "",
     rating: 0,
     dateRead: ""
@@ -34,28 +36,32 @@ const Dashboard = () => {
 
   const fetchData = async () => {
     try {
-      // 1. Get User
       const userRes = await axios.get('http://localhost:3000/auth/user', { withCredentials: true });
-      setUser(userRes.data);
       
-      setProfileForm({
-        nickname: userRes.data.nickname || "", 
-        bio: userRes.data.bio || "Book Lover <3",
-        favoriteGenre: userRes.data.favoriteGenre || "Romance, Fantasy, Literature",
-        goal: userRes.data.goal || 100
-      });
+      if (userRes.data && userRes.data.email) {
+        setUser(userRes.data);
+        
+        setProfileForm({
+          nickname: userRes.data.nickname || "", 
+          bio: userRes.data.bio || "",
+          favoriteGenre: userRes.data.favoriteGenre || "",
+          goal: userRes.data.goal 
+        });
+      } else {
+        setUser(null);
+      }
 
-      // 2. Get Books
       const bookRes = await axios.get('http://localhost:3000/api/bookshelf', { withCredentials: true });
       setBooks(bookRes.data);
+
     } catch (err) {
       console.error("Dashboard Load Error:", err);
+      setUser(null); 
     } finally {
       setLoading(false);
     }
   };
 
-  // --- PROFILE ACTIONS ---
   const handleSaveProfile = async () => {
     try {
       const res = await axios.put('http://localhost:3000/auth/update-profile', profileForm, { withCredentials: true });
@@ -66,11 +72,10 @@ const Dashboard = () => {
     }
   };
 
-  // --- DIARY ACTIONS ---
   const openEditDiary = (book) => {
     setEditingEntry(book);
     setDiaryForm({
-      memorableScene: book.memorableScene || "",
+      notes: book.notes || "",
       quotes: book.quotes || "",
       rating: book.rating || 0,
       dateRead: book.dateRead ? book.dateRead.split('T')[0] : ""
@@ -100,7 +105,7 @@ const Dashboard = () => {
     if (!confirm("Are you sure? This will remove this entry from your diary (but keep the book in your library).")) return;
 
     try {
-      const emptyData = { memorableScene: "", quotes: "", rating: 0, notes: "", dateRead: null };
+      const emptyData = { notes: "", quotes: "", rating: 0, notes: "", dateRead: null };
       
       const updatedBooks = books.map(b => 
         b._id === editingEntry._id ? { ...b, ...emptyData } : b
@@ -118,124 +123,151 @@ const Dashboard = () => {
 
   if (loading) return <div className="loading">Loading Dashboard...</div>;
 
+  if (!user) {
+    return (
+      <div className="bounce-message">
+        <h2>Please Log In</h2>
+        <p>You need to be logged in to view your dashboard.</p>
+        <button className="button bounce-button" onClick={() => window.location.href = 'http://localhost:3000/auth/google'}>
+        Login with Google
+        </button>
+      </div>
+    );
+  }
+
   // --- FILTER LOGIC ---
   const topFour = books.filter(b => b.isTopPick === true).slice(0, 4);
-  const diaryEntries = books.filter(b => b.memorableScene || b.quotes || b.rating > 0 || b.notes);
+  const diaryEntries = books.filter(b => b.notes || b.quotes || b.rating > 0);
   const totalReadCount = books.filter(b => b.shelf === 'Read' || b.shelf === 'Completed').length;
 
-  return (
-    <div className="dashboard-container">
-      
-      {/* HEADER */}
-      <header className="dash-header">
-        <div className="top-nav-links">
-          <span onClick={() => navigate('/')}>HOME</span>
-          <span onClick={() => navigate('/search')}>SEARCH</span>
-          <span onClick={() => navigate('/shelves')}>SHELF</span>
-          <span className="active">DASHBOARD</span>
-        </div>
+  // --- 🆕 MASONRY LOGIC: Split items into Left (Even) and Right (Odd) ---
+  const leftColumn = diaryEntries.filter((_, index) => index % 2 === 0);
+  const rightColumn = diaryEntries.filter((_, index) => index % 2 !== 0);
 
-        {/* 🆕 UPDATED: Uses nickname if available, falls back to displayName or 'READER' */}
+  // --- HELPER FUNCTION: Renders a single card (Keeps code clean) ---
+  const renderDiaryCard = (entry) => (
+    <div key={entry._id} className="diary-card">
+
+      <div className='diary-content-top'>
+        <div className="entry-cover">
+          <img src={entry.coverImage} alt={entry.title} />
+        </div>
+        <div className="entry-details">
+          <h3 className='entry-title'>{entry.title}</h3>
+          <p className='entry-notes'>{entry.notes}</p>
+          <p className='entry-date'>{entry.dateRead ? new Date(entry.dateRead).toLocaleDateString() : ""}</p>
+        </div>
+      </div>
+
+      <div className="diary-content-bottom">
+        {entry.quotes && <p><strong>Quotes:</strong><br />{entry.quotes}</p>}
+        {entry.rating > 0 && <p><strong>Rating:</strong> {entry.rating}/10</p>}
+      </div>
+
+      <img 
+        className="icon-image edit-diary-button" 
+        onClick={() => openEditDiary(entry)}
+        title="Edit or Delete Entry" 
+        src={EditImage}
+        alt="Edit Diary"
+      />
+    </div>
+  );
+
+  return (
+    <div className="container">
+      
+      <header>
         <h1 className="greeting">
-          HEY, {user?.nickname ? user.nickname.toUpperCase() : (user?.displayName ? user.displayName.toUpperCase().split(' ')[0] : 'READER')}
+          HEY, {user.nickname ? user.nickname : (user.displayName ? user.displayName.toUpperCase().split(' ')[0] : 'READER')}
         </h1>
 
-        <div className="stats-pill">
+        <div className="account-stats">
           <div className="stat-left">
-            <strong>{user?.bio?.toUpperCase() || "BOOK LOVER <3"}</strong><br/>
-            <span>FAVORITE GENRE: {user?.favoriteGenre?.toUpperCase() || "ROMANCE, FANTASY"}</span>
+            <p>{user.bio ||""}</p>
+            <p><span>Favorite Genre:</span> {user.favoriteGenre || ""}</p>
           </div>
           <div className="stat-right">
-            <strong>GOAL: {user?.goal || 100}</strong><br/>
-            <span>TOTAL READ: {totalReadCount}</span>
+            <p><span>Goal:</span> {user.goal || 0}</p>
+            <p><span>Total Read:</span> {totalReadCount}</p>
           </div>
         </div>
 
-        {/* --- BUTTONS CONTAINER --- */}
-        <div style={{ display: 'flex', gap: '15px', justifyContent: 'center', marginTop: '20px' }}>
-          
-          <button className="settings-btn" onClick={() => setIsProfileModalOpen(true)}>
-            ACCOUNT SETTINGS
+        <div className="user-settings">  
+          <button className="button" onClick={() => setIsProfileModalOpen(true)}>
+            Account Settings
           </button>
-
-          {user?.role === 'admin' && (
-            <button 
-              className="settings-btn" 
-              style={{ backgroundColor: 'black', color: 'white' }} 
-              onClick={() => navigate('/admin')}
-            >
-              ADMIN PANEL
+          {user.role === 'admin' && (
+            <button className="button admin-button" onClick={() => navigate('/admin')}>
+              Admin Panel
             </button>
           )}
-
         </div>
       </header>
 
-      <section className="top-four-section">
-        <h2 className="section-title">MY TOP 4</h2>
-        <div className="top-four-grid">
+      <section className="top-four-container">
+        <h1 className="section-title">My Top 4</h1>
+        <hr />
+        <div className="books-container">
           {topFour.map((book) => (
-            <div key={book._id} className="top-book-card">
-              <div className="arch-frame">
-                <img src={book.coverImage} alt={book.title} onError={(e) => {e.target.src="https://via.placeholder.com/150"}}/>
+            <div key={book._id} className="book-card">
+              <div
+                className="book-cover-wrapper"
+                style={{ backgroundImage: `url(${BackgroundImage})` }}
+              >
+                <img 
+                  src={book.coverImage || "https://placehold.co/128x190"} 
+                  alt={book.title}
+                  onError={(e) => { e.target.src = "https://placehold.co/128x190"; }}
+                />
               </div>
-              <h3>{book.title.toUpperCase()}</h3>
-              <p>{book.authors[0]?.toUpperCase()}</p>
+              <div className="book-details">
+                <h3>{book.title}</h3>
+                <p>{book.authors?.[0] || "Unknown"}</p>
+              </div>
             </div>
           ))}
-          {topFour.length === 0 && <p style={{color: '#888', fontStyle: 'italic'}}>Heart books in your shelves to see them here!</p>}
         </div>
+        {topFour.length === 0 && (
+          <p className="empty-message">Heart books in your shelves to see them here!</p>
+        )}
       </section>
 
-      <div className="flower-divider">
-        {'✻ ✽ ✺ ✹ ✸ ✷ ✶ ✴ ❄ ❅ ❆ ❇ ❈ ❉ ❊ ❋'.split(' ').map((char, i) => <span key={i}>{char}</span>)}
-      </div>
+      <HorizontalLine />
 
-      <section className="diary-section">
-        <h2 className="section-title">READING DIARY</h2>
+      <section>
+        <h1 className="section-title">Reading Diary</h1>
+        <hr />
         
-        <div className="diary-feed">
-          {diaryEntries.length === 0 ? (
-            <p className="empty-msg">No diary entries yet. Fill out the "Digital Diary" form on a book page!</p>
-          ) : (
-            diaryEntries.map((entry) => (
-              <div key={entry._id} className="diary-entry-card hover-trigger">
-                
-                <button 
-                  className="edit-diary-btn" 
-                  onClick={() => openEditDiary(entry)}
-                  title="Edit or Delete Entry"
-                >
-                  ✎
-                </button>
+        {diaryEntries.length === 0 ? (
+          <p className="empty-message">No diary entries yet. Fill out the "Digital Diary" form on a book page!</p>
+        ) : (
+          <div className="diary-masonry-feed">
+            
+            <div className="masonry-column">
+              {leftColumn.map(renderDiaryCard)}
+            </div>
 
-                <div className="entry-cover">
-                  <img src={entry.coverImage} alt={entry.title} />
-                </div>
-                <div className="entry-content">
-                  <div className="entry-header">
-                    <h3>{entry.title.toUpperCase()}</h3>
-                    <p className="entry-date">
-                      {entry.dateRead ? new Date(entry.dateRead).toLocaleDateString() : ""}
-                    </p>
-                  </div>
-                  {entry.memorableScene && <div className="diary-block"><strong>MEMORABLE SCENE:</strong><p>{entry.memorableScene}</p></div>}
-                  {entry.quotes && <div className="diary-block"><strong>QUOTES:</strong><p>"{entry.quotes}"</p></div>}
-                  {entry.rating > 0 && <div className="diary-rating"><strong>RATING:</strong> {entry.rating}/10</div>}
-                </div>
-              </div>
-            ))
-          )}
-        </div>
+            <div className="masonry-column">
+              {rightColumn.map(renderDiaryCard)}
+            </div>
+
+          </div>
+        )}
       </section>
+
+      <HorizontalLine />
 
       {/* --- MODAL 1: EDIT PROFILE --- */}
+
       {isProfileModalOpen && (
+
         <div className="modal-overlay">
+
           <div className="modal-content">
-            <h3>Edit Profile</h3>
             
-            {/* 🆕 ADDED NICKNAME INPUT */}
+            <h3>Editing Profile</h3>
+
             <label>Nickname:</label>
             <input 
               type="text" 
@@ -267,8 +299,8 @@ const Dashboard = () => {
           <div className="modal-content" style={{width: '500px'}}>
             <h3>Edit Entry: {editingEntry?.title}</h3>
             
-            <label>Memorable Scene:</label>
-            <textarea rows="3" value={diaryForm.memorableScene} onChange={(e) => setDiaryForm({...diaryForm, memorableScene: e.target.value})} style={{width: '100%', padding:'10px', marginBottom: '10px'}} />
+            <label>Notes:</label>
+            <textarea rows="3" value={diaryForm.notes} onChange={(e) => setDiaryForm({...diaryForm, notes: e.target.value})} style={{width: '100%', padding:'10px', marginBottom: '10px'}} />
             
             <label>Quotes:</label>
             <textarea rows="2" value={diaryForm.quotes} onChange={(e) => setDiaryForm({...diaryForm, quotes: e.target.value})} style={{width: '100%', padding:'10px', marginBottom: '10px'}} />

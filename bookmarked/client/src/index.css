@@ -1,15 +1,11 @@
 :root {
   --background: #f8e1e6;
-  --text-black: #366baa;
+  --text-black: #000000;
   --text-white: #ffffff;
   --text-grey: #7a7a7a;
 
   --primary-blue: #366baa;
-
-  --pastel-purple: #98a2c4;
-  --pastel-orange: #e7c79a;
-  --pastel-blue: #98c0d3;
-  --pastel-red: #d7b1a3;
+  --secondary-red: #a43030;
 
   margin: 0;
   padding: 0;
@@ -40,7 +36,7 @@ body {
   font-size: 20px;
   line-height: 2;
   background-color: var(--background);
-  color: var(--text-black);
+  color: var(--primary-blue);
 }
 
 
@@ -61,6 +57,7 @@ h2 {
 }
 
 .button {
+  font-family: 'Glacial Indifference', Arial, Helvetica, sans-serif;
   font-size: 18px;
   display: inline-block;   
   background-color: var(--primary-blue); 
