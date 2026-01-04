@@ -311,7 +311,7 @@ const Shelves = () => {
                 </select>
 
                 {selectedShelf === "custom" && (
-                <input type="text" placeholder="Enter new shelf name..." autoFocus value={customShelfName} onChange={(e) => setCustomShelfName(e.target.value)} />
+                <input className="modal-input" type="text" placeholder="Enter new shelf name..." autoFocus value={customShelfName} onChange={(e) => setCustomShelfName(e.target.value)} />
                 )}
 
             </div>
@@ -335,7 +335,7 @@ const Shelves = () => {
             <h3>Editing Shelf: "{targetShelf}"</h3>
             <div>
               <label>Rename this shelf to:</label>
-              <input type="text" value={newShelfName} onChange={(e) => setNewShelfName(e.target.value)}/>
+              <input className="modal-input" type="text" value={newShelfName} onChange={(e) => setNewShelfName(e.target.value)}/>
             </div>
             <div className="modal-actions-list shelf-modal">
               <img src={TrashIcon} onClick={handleDeleteShelf} className="icon-image" alt="Delete"/>

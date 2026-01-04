@@ -54,6 +54,10 @@
   text-align: center;
 }
 
+.empty-diary {
+  margin-top: 100px;
+}
+
 .diary-masonry-feed {
   display: flex;       
   gap: 50px;           
@@ -120,8 +124,11 @@
 
 .diary-content-bottom {
   text-align: justify;
-  font-size: 18px;
   margin-top: 20px;
+}
+
+.diary-content-bottom p {
+  font-size: 16px;
 }
 
 strong {
@@ -144,4 +151,23 @@ strong {
 .diary-card:hover .edit-diary-button {
   opacity: 1;
   visibility: visible;
+}
+
+.diary-profile-actions {
+  margin: 40px 0 10px;
+}
+
+.diary-delete-button {
+  background-color: var(--secondary-red);
+  color: var(--text-white);
+  border: 2px solid var(--secondary-red);
+}
+
+.diary-delete-button:hover {
+  background-color: transparent;
+  color: var(--secondary-red);
+}
+
+.dashboard-hr {
+  margin: 30px 0;
 }

@@ -96,7 +96,7 @@ function BookDetails() {
         withCredentials: true
       });
 
-      alert("✅ Diary updated successfully!");
+      alert("Diary updated successfully!");
       navigate('/dashboard');
 
     } catch (err) {

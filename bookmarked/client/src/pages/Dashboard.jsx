@@ -4,7 +4,7 @@ import axios from 'axios';
 import BackgroundImage from "../assets/images/background-image.png"; 
 import HorizontalLine from "../components/HorizontalLine.jsx";
 import EditImage from "../assets/images/edit-icon.png"; 
-import './Dashboard.css';
+import '../style/Dashboard.css';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -135,16 +135,13 @@ const Dashboard = () => {
     );
   }
 
-  // --- FILTER LOGIC ---
   const topFour = books.filter(b => b.isTopPick === true).slice(0, 4);
   const diaryEntries = books.filter(b => b.notes || b.quotes || b.rating > 0);
   const totalReadCount = books.filter(b => b.shelf === 'Read' || b.shelf === 'Completed').length;
 
-  // --- 🆕 MASONRY LOGIC: Split items into Left (Even) and Right (Odd) ---
   const leftColumn = diaryEntries.filter((_, index) => index % 2 === 0);
   const rightColumn = diaryEntries.filter((_, index) => index % 2 !== 0);
 
-  // --- HELPER FUNCTION: Renders a single card (Keeps code clean) ---
   const renderDiaryCard = (entry) => (
     <div key={entry._id} className="diary-card">
 
@@ -240,7 +237,7 @@ const Dashboard = () => {
         <hr />
         
         {diaryEntries.length === 0 ? (
-          <p className="empty-message">No diary entries yet. Fill out the "Digital Diary" form on a book page!</p>
+          <p className="empty-message empty-diary">No diary entries yet. Fill out a diary on any book page!</p>
         ) : (
           <div className="diary-masonry-feed">
             
@@ -270,6 +267,7 @@ const Dashboard = () => {
 
             <label>Nickname:</label>
             <input 
+              className="modal-input"
               type="text" 
               value={profileForm.nickname} 
               onChange={(e) => setProfileForm({...profileForm, nickname: e.target.value})} 
@@ -277,52 +275,57 @@ const Dashboard = () => {
             />
 
             <label>Short Bio:</label>
-            <input type="text" value={profileForm.bio} onChange={(e) => setProfileForm({...profileForm, bio: e.target.value})} />
+            <input className="modal-input" type="text" value={profileForm.bio} onChange={(e) => setProfileForm({...profileForm, bio: e.target.value})} />
             
             <label>Genres:</label>
-            <input type="text" value={profileForm.favoriteGenre} onChange={(e) => setProfileForm({...profileForm, favoriteGenre: e.target.value})} />
+            <input className="modal-input" type="text" value={profileForm.favoriteGenre} onChange={(e) => setProfileForm({...profileForm, favoriteGenre: e.target.value})} />
             
             <label>Goal:</label>
-            <input type="number" value={profileForm.goal} onChange={(e) => setProfileForm({...profileForm, goal: e.target.value})} />
-            
-            <div className="modal-actions">
-              <button onClick={() => setIsProfileModalOpen(false)}>Cancel</button>
-              <button onClick={handleSaveProfile} style={{background: '#4a6fa5', color: 'white', border: 'none'}}>Save</button>
+            <input className="modal-input" type="number" value={profileForm.goal} onChange={(e) => setProfileForm({...profileForm, goal: e.target.value})} />
+
+            <hr className="dashboard-hr"/>
+
+            <div className="modal-actions-list diary-profile-actions">
+              <button className="cancel-button" onClick={() => setIsProfileModalOpen(false)}>Cancel</button>
+              <button className="button" onClick={handleSaveProfile} style={{background: '#4a6fa5', color: 'white', border: 'none'}}>Save</button>
             </div>
           </div>
         </div>
       )}
 
       {/* --- MODAL 2: EDIT DIARY ENTRY --- */}
+
       {isDiaryModalOpen && (
         <div className="modal-overlay">
-          <div className="modal-content" style={{width: '500px'}}>
+          <div className="modal-content">
             <h3>Edit Entry: {editingEntry?.title}</h3>
             
             <label>Notes:</label>
-            <textarea rows="3" value={diaryForm.notes} onChange={(e) => setDiaryForm({...diaryForm, notes: e.target.value})} style={{width: '100%', padding:'10px', marginBottom: '10px'}} />
+            <textarea className="modal-input" rows="3" value={diaryForm.notes} onChange={(e) => setDiaryForm({...diaryForm, notes: e.target.value})} />
             
             <label>Quotes:</label>
-            <textarea rows="2" value={diaryForm.quotes} onChange={(e) => setDiaryForm({...diaryForm, quotes: e.target.value})} style={{width: '100%', padding:'10px', marginBottom: '10px'}} />
+            <textarea className="modal-input" rows="2" value={diaryForm.quotes} onChange={(e) => setDiaryForm({...diaryForm, quotes: e.target.value})} />
             
             <div style={{display: 'flex', gap: '20px'}}>
+
               <div style={{flex: 1}}>
                 <label>Date Read:</label>
-                <input type="date" value={diaryForm.dateRead} onChange={(e) => setDiaryForm({...diaryForm, dateRead: e.target.value})} />
+                <input className="modal-input" type="date" value={diaryForm.dateRead} onChange={(e) => setDiaryForm({...diaryForm, dateRead: e.target.value})} />
               </div>
+
               <div style={{flex: 1}}>
                 <label>Rating (0-10):</label>
-                <input type="number" min="0" max="10" value={diaryForm.rating} onChange={(e) => setDiaryForm({...diaryForm, rating: e.target.value})} />
+                <input className="modal-input" type="number" min="0" max="10" value={diaryForm.rating} onChange={(e) => setDiaryForm({...diaryForm, rating: e.target.value})} />
               </div>
+              
             </div>
 
-            <div className="modal-actions" style={{marginTop: '20px', borderTop: '1px solid #eee', paddingTop: '20px'}}>
-              <button onClick={handleDeleteEntry} style={{color: 'red', border: '1px solid red', background: 'white'}}>🗑 Delete Entry</button>
-              
-              <div style={{display: 'flex', gap: '10px'}}>
-                <button onClick={() => setIsDiaryModalOpen(false)}>Cancel</button>
-                <button onClick={handleSaveDiary} style={{background: '#4a6fa5', color: 'white', border: 'none'}}>Save Changes</button>
-              </div>
+            <hr className="dashboard-hr"/>
+
+            <div className="modal-actions-list diary-profile-actions" >
+              <button className="cancel-button" onClick={() => setIsDiaryModalOpen(false)}>Cancel</button>
+              <button className="button" onClick={handleSaveDiary}>Save Changes</button>
+              <button className="button diary-delete-button" onClick={handleDeleteEntry}> Delete Entry</button>
             </div>
           </div>
         </div>
