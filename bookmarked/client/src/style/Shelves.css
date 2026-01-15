@@ -1,3 +1,5 @@
+/* Empty State and Splash Animations */
+
 .bounce-message {
   padding-top: 60px;
   height: 500px;
@@ -40,9 +42,35 @@
   font-family: 'Glacial Indifference', Arial, Helvetica, sans-serif;
 }
 
+/* Shelf Containers and Headers */
+
 .shelf-container {
   margin-top: 50px;
 }
+
+.shelf-information {
+  margin: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.shelf-name {
+  text-align: left;
+  font-size: clamp(2rem, 5vw, 3rem);
+  margin: 0;
+}
+
+.empty-shelf {
+  text-align: center;
+  margin: 120px 0;
+  color: var(--text-grey);
+  font-style: italic;
+  font-size: 15px;
+}
+
+/* Modal Overlay and Content */
 
 .modal-overlay {
   padding: 15px;
@@ -55,11 +83,6 @@
   z-index: 2000;
 }
 
-.modal-content h3 {
-  font-family: 'Glacial Indifference Bold', Arial, Helvetica, sans-serif;
-  margin: 0 0 30px;
-}
-
 .modal-content {
   line-height: 1.2;
   background: var(--text-white);
@@ -69,6 +92,13 @@
   text-align: center;
   box-shadow: 0 10px 25px rgba(0,0,0,0.2);
 }
+
+.modal-content h3 {
+  font-family: 'Glacial Indifference Bold', Arial, Helvetica, sans-serif;
+  margin: 0 0 30px;
+}
+
+/* Modal Inputs and Form Elements */
 
 .modal-content select {
   font-family: inherit;
@@ -98,13 +128,6 @@
   margin-bottom: 40px;
 }
 
-.modal-footer {
-  display: flex;
-  justify-content: center;
-  margin-top: 40px;
-  gap: 10px;
-}
-
 .shelf-modal {
   margin: 10px 0 30px;
   display: flex;
@@ -117,34 +140,13 @@
   font-size: 15px;
 }
 
+/* Modal Footer and Buttons */
 
-.shelf-information {
-  margin: 0;
+.modal-footer {
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.shelf-name {
-  text-align: left;
-  font-size: clamp(2rem, 5vw, 3rem);
-  margin: 0;
-}
-
-.book-card a {
-  text-decoration: none;
-}
-
-.book-card .icon-image {
-  visibility: hidden;
-  opacity: 0;
-  transition: all 0.3s ease-in-out;
-}
-
-.book-card:hover .icon-image {
-  opacity: 1;
-  visibility: visible;
+  justify-content: center;
+  margin-top: 40px;
+  gap: 10px;
 }
 
 .cancel-button {
@@ -165,16 +167,26 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);    
 }
 
-.empty-shelf {
-  text-align: center;
-  margin: 120px 0;
-  color: var(--text-grey);
-  font-style: italic;
-  font-size: 15px;
+/* Book Card Interactions */
+
+.book-card a {
+  text-decoration: none;
 }
 
-@media screen and (max-width: 850px) {
+.book-card .icon-image {
+  visibility: hidden;
+  opacity: 0;
+  transition: all 0.3s ease-in-out;
+}
 
+.book-card:hover .icon-image {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Responsive Design */
+
+@media screen and (max-width: 850px) {
   .bounce-message {
       gap: 5px;
   }
@@ -213,7 +225,6 @@
   .empty-shelf{
     font-size: 12px;
   }
-
 }
 
 @media screen and (max-width: 650px) {
@@ -231,4 +242,3 @@
     margin-top: 0;
   }
 }
-

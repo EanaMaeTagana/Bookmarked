@@ -1,4 +1,7 @@
+/* Variables and Fonts */
+
 :root {
+  /* defines the global CSS variables for colors and spacing */
   --background: #f8e1e6;
   --admin-background: #f0f0f0;
   --text-black: #000000;
@@ -13,6 +16,7 @@
   padding: 30px;
 }
 
+/* imports the custom fonts */
 @font-face {
   font-family: 'Glacial Indifference';
   src: url('./assets/fonts/glacial-regular.otf');
@@ -33,7 +37,10 @@
   font-style: normal;
 }
 
+/* Global Styles */
+
 body {
+  /* sets the base typography and fixed background for the whole site */
   font-family: 'Glacial Indifference', Arial, Helvetica, sans-serif;
   font-size: 20px;
   background-color: var(--background);
@@ -45,6 +52,7 @@ body {
 }
 
 .container {
+  /* centers the main content across all pages */
   max-width: 1280px;
   margin: 0 auto;
   text-align: center; 
@@ -58,6 +66,13 @@ h2 {
   font-family: 'Glacial Indifference Bold', Arial, Helvetica, sans-serif;
   line-height: 1;
 }
+
+.page-container {
+  /* provides consistent bottom spacing for page sections */
+  margin-bottom: 80px;
+}
+
+/* Common Components */
 
 .button {
   font-family: 'Glacial Indifference', Arial, Helvetica, sans-serif;
@@ -80,20 +95,7 @@ h2 {
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.221);  
 }
 
-.page-container {
-  margin-bottom: 80px;
-}
-
-@media screen and (max-width: 850px) {
-  :root {
-    padding: 10px;
-  }
-
-  .button {
-    font-size: 10px;
-    padding: 4px 20px;  
-  }
-}
+/* Global Alert System */
 
 .alert-overlay {
     position: fixed;
@@ -131,7 +133,8 @@ h2 {
     to { opacity: 1; transform: scale(1); }
 }
 
-/* --- NEW ENTRY SCREEN STYLES --- */
+/* Entry Splash Screen */
+
 .entry-screen {
   position: fixed;
   top: 0;
@@ -164,12 +167,6 @@ h2 {
   animation: entryPulse 3s infinite;
 }
 
-@keyframes entryPulse {
-  0% { opacity: 0.4; }
-  50% { opacity: 1; }
-  100% { opacity: 0.4; }
-}
-
 .entry-image {
   width: 100px;     
   margin-bottom: 20px;
@@ -179,11 +176,26 @@ h2 {
   animation: spin 10s linear infinite; 
 }
 
+@keyframes entryPulse {
+  0% { opacity: 0.4; }
+  50% { opacity: 1; }
+  100% { opacity: 0.4; }
+}
+
 @keyframes spin {
-  from {
-    transform: rotate(0deg);
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+
+@media screen and (max-width: 850px) {
+  :root {
+    padding: 10px;
   }
-  to {
-    transform: rotate(360deg);
+
+  .button {
+    font-size: 10px;
+    padding: 4px 20px;  
   }
 }

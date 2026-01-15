@@ -1,11 +1,17 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+
+// Component Imports
 import Header from "../components/Header.jsx";
+import HorizontalLine from "../components/HorizontalLine.jsx";
+
+// Asset Imports
 import BackgroundImage from "../assets/images/background-image.png"; 
 import RotatingImage from "../assets/images/rotating-image.png"; 
-import HorizontalLine from "../components/HorizontalLine.jsx";
 import EditImage from "../assets/images/edit-icon.png"; 
+
+// Style Imports
 import '../style/Dashboard.css';
 
 const Dashboard = ({ triggerAlert }) => {
@@ -15,6 +21,7 @@ const Dashboard = ({ triggerAlert }) => {
   const [loading, setLoading] = useState(true);
 
   // --- MODAL STATE ---
+  // manages visibility and form data for the account settings popup
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [profileForm, setProfileForm] = useState({
     nickname: "", 
@@ -23,6 +30,7 @@ const Dashboard = ({ triggerAlert }) => {
     goal: 0 
   });
 
+  // manages visibility and form data for the reading diary editor
   const [isDiaryModalOpen, setIsDiaryModalOpen] = useState(false);
   const [editingEntry, setEditingEntry] = useState(null); 
   const [diaryForm, setDiaryForm] = useState({
@@ -32,10 +40,12 @@ const Dashboard = ({ triggerAlert }) => {
     dateRead: ""
   });
 
+  // fetch user data and bookshelf on component mount
   useEffect(() => {
     fetchData();
   }, []);
 
+  // pulls the authenticated user profile and their full library from the backend
   const fetchData = async () => {
     try {
       const userRes = await axios.get('http://localhost:3000/auth/user', { withCredentials: true });
@@ -53,13 +63,13 @@ const Dashboard = ({ triggerAlert }) => {
       const bookRes = await axios.get('http://localhost:3000/api/bookshelf', { withCredentials: true });
       setBooks(bookRes.data);
     } catch (err) {
-      console.error("Dashboard Error:", err);
       setUser(null); 
     } finally {
       setLoading(false);
     }
   };
 
+  // submits updated profile information to the database
   const handleSaveProfile = async () => {
     try {
       const res = await axios.put('http://localhost:3000/auth/update-profile', profileForm, { withCredentials: true });
@@ -72,6 +82,7 @@ const Dashboard = ({ triggerAlert }) => {
   };
 
   // --- DELETE ACCOUNT LOGIC ---
+  // handles account deletion with a confirmation prompt
   const handleDeleteAccount = () => {
     triggerAlert("Are you sure? This will permanently delete your account and all your book data.", async () => {
       try {
@@ -84,6 +95,7 @@ const Dashboard = ({ triggerAlert }) => {
     });
   };
 
+  // opens the diary modal and pre-fills it with existing data for the selected book
   const openEditDiary = (book) => {
     setEditingEntry(book);
     setDiaryForm({
@@ -95,6 +107,7 @@ const Dashboard = ({ triggerAlert }) => {
     setIsDiaryModalOpen(true);
   };
 
+  // saves diary notes, quotes, and ratings to the specific book entry
   const handleSaveDiary = async () => {
     if (!editingEntry) return;
     try {
@@ -108,6 +121,7 @@ const Dashboard = ({ triggerAlert }) => {
     }
   };
 
+  // clears a diary entry while keeping the book on the user's shelf
   const handleDeleteEntry = () => {
     if (!editingEntry) return;
     triggerAlert("Clear this diary entry? The book will remain on your shelf.", async () => {
@@ -124,8 +138,13 @@ const Dashboard = ({ triggerAlert }) => {
     });
   };
 
-  if (loading) return <div className="loading">Dusting off the shelves...</div>;
+  // loading state shown during initial data fetch
+  if (loading) return <div className="loading-screen">
+    <img className="static-rotating-image" src={RotatingImage} alt="Loading" />
+    <p>Dusting off the archives...</p>
+  </div>;
 
+  // login prompt shown if no authenticated session is found
   if (!user) {
     return (
       <div className="container">
@@ -141,13 +160,16 @@ const Dashboard = ({ triggerAlert }) => {
     );
   }
 
+  // filter logic for top picks and reading diary feed
   const topFour = books.filter(b => b.isTopPick === true).slice(0, 4);
   const diaryEntries = books.filter(b => b.notes || b.quotes || b.rating > 0);
   const totalReadCount = books.filter(b => b.shelf === 'Read' || b.shelf === 'Completed').length;
 
+  // split diary entries for the masonry layout
   const leftColumn = diaryEntries.filter((_, index) => index % 2 === 0);
   const rightColumn = diaryEntries.filter((_, index) => index % 2 !== 0);
 
+  // helper function to render individual diary cards
   const renderDiaryCard = (entry) => (
     <div key={entry._id} className="diary-card">
       <div className='diary-content-top'>
@@ -177,6 +199,7 @@ const Dashboard = ({ triggerAlert }) => {
 
   return (
     <div className="container">
+      {/* User Profile */}
       <header>
         <h1 className="greeting">HEY, {user.nickname ? user.nickname : (user.displayName ? user.displayName.toUpperCase().split(' ')[0] : 'READER')}</h1>
         <div className="account-stats">
@@ -195,6 +218,7 @@ const Dashboard = ({ triggerAlert }) => {
         </div>
       </header>
 
+      {/* Top Picks */}
       <section>
         <h1 className="section-title">My Top 4</h1>
         <hr />
@@ -213,6 +237,7 @@ const Dashboard = ({ triggerAlert }) => {
 
       <HorizontalLine />
 
+      {/* Reading Diary */}
       <section>
         <h1 className="section-title">Reading Diary</h1>
         <hr />
@@ -228,7 +253,7 @@ const Dashboard = ({ triggerAlert }) => {
 
       <HorizontalLine />
 
-      {/* --- MODALS --- */}
+      {/* Modal: Account Settings */}
       {isProfileModalOpen && (
         <div className="modal-overlay">
           <div className="modal-content">
@@ -246,13 +271,13 @@ const Dashboard = ({ triggerAlert }) => {
             <div className="modal-footer">
               <button className="cancel-button" onClick={() => setIsProfileModalOpen(false)}>Cancel</button>
               <button className="button" onClick={handleSaveProfile}>Save</button>
-              {/* ADDED: Delete Account Button */}
               <button className="button diary-delete-button" onClick={handleDeleteAccount}>Delete Account</button>
             </div>
           </div>
         </div>
       )}
 
+      {/* Modal: Diary Entries */}
       {isDiaryModalOpen && (
         <div className="modal-overlay">
           <div className="modal-content">

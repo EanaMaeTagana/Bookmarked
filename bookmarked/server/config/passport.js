@@ -1,25 +1,27 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const User = require('../models/Users'); // Ensure this path is correct
+const User = require('../models/Users');
 
-// 1. SERIALIZE: Decide what to store in the session cookie
+// Session Serialization
+// determines which data should be stored in the session cookie
 passport.serializeUser((user, done) => {
   if (user.isNew) {
-    // If it's a "Temp" user (not in DB yet), store the whole object
+    // stores the whole temporary object for users not yet in the Database
     done(null, user);
   } else {
-    // If it's a real user, just store the ID (Standard practice)
+    // stores only the unique ID for existing users in the Database
     done(null, user.id);
   }
 });
 
-// 2. DESERIALIZE: Recover user from the session cookie
+// Session Deserialization
+// retrieves the full user information from the session data
 passport.deserializeUser(async (idOrObj, done) => {
-  // Check if it's our "Temp" user object
   if (idOrObj.isNew) {
+    // returns the temporary object for new users immediately
     done(null, idOrObj);
   } else {
-    // It's a real ID, look it up in the database
+    // looks up the existing user in MongoDB using their stored ID
     try {
       const user = await User.findById(idOrObj);
       done(null, user);
@@ -29,7 +31,8 @@ passport.deserializeUser(async (idOrObj, done) => {
   }
 });
 
-// 3. THE STRATEGY
+// Google OAuth Strategy
+// configures the passport strategy with credentials and callback logic
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
@@ -37,16 +40,15 @@ passport.use(new GoogleStrategy({
   },
   async (accessToken, refreshToken, profile, done) => {
     try {
-      // Check if user exists in MongoDB
+      // checks if a profile with this Google ID already exists in MongoDB
       const existingUser = await User.findOne({ googleId: profile.id });
 
       if (existingUser) {
-        // CASE A: User Found -> Log them in
+        // logs in the existing member found in the Database
         return done(null, existingUser);
       } else {
-        // CASE B: User NOT Found (New or Deleted)
-        // ⚠️ CHANGE: We do NOT create the user here anymore.
-        // We pass a temp object so the router knows to redirect them.
+        // creates a temporary object for new or deleted users
+        // this object is used to redirect them to the onboarding page
         const tempUser = {
           isNew: true,
           googleId: profile.id,
@@ -56,7 +58,6 @@ passport.use(new GoogleStrategy({
         return done(null, tempUser);
       }
     } catch (err) {
-      console.error(err);
       return done(err, null);
     }
   }

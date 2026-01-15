@@ -1,3 +1,5 @@
+/* Main Navigation Bar */
+
 nav {
     display: flex;
     justify-content: space-between;
@@ -9,9 +11,7 @@ nav {
     border-bottom: 2px solid var(--primary-blue);
 }
 
-.nav-actions {
-    line-height: 0;
-}
+/* Navigation Links */
 
 .nav-links {
     display: flex;
@@ -40,6 +40,12 @@ nav a:hover {
     transform: scale(1.1); 
 }
 
+/* Icons and User Actions */
+
+.nav-actions {
+    line-height: 0;
+}
+
 .icon-image {
     height: 30px !important;
     width: 30px !important;
@@ -51,28 +57,7 @@ nav a:hover {
     transform: scale(1.2);
 }
 
-.hamburger {
-    display: none; 
-    flex-direction: column;
-    justify-content: space-around;
-    z-index: 10;
-    width: 25px;
-    height: 20px;
-    background: transparent;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-}
-
-.bar {
-    width: 25px;
-    height: 3px;
-    background-color: var(--primary-blue);
-    border-radius: 10px;
-    position: relative;
-    transform-origin: 1px;
-    transition: all 0.3s linear;
-}
+/* Dropdown Menu UI */
 
 .dropdown-menu {
     position: absolute;
@@ -133,10 +118,37 @@ nav a:hover {
     border: solid 2px var(--secondary-red);
 }
 
+/* Mobile Hamburger Menu */
+
 .mobile-nav-container {
     display: flex;
     align-items: center;
 }
+
+.hamburger {
+    display: none; 
+    flex-direction: column;
+    justify-content: space-around;
+    z-index: 10;
+    width: 25px;
+    height: 20px;
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+}
+
+.bar {
+    width: 25px;
+    height: 3px;
+    background-color: var(--primary-blue);
+    border-radius: 10px;
+    position: relative;
+    transform-origin: 1px;
+    transition: all 0.3s linear;
+}
+
+/* Animations */
 
 @keyframes dropdownFadeIn {
     from { 
@@ -148,6 +160,8 @@ nav a:hover {
         transform: translateY(0); 
     }
 }
+
+/* Responsive Design */
 
 @media (max-width: 850px) {
     nav {

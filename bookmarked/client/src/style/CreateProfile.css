@@ -1,3 +1,5 @@
+/* Animations */
+
 @keyframes floatUp {
   from {
     opacity: 0;
@@ -8,6 +10,8 @@
     transform: translateY(0);
   }
 }
+
+/* Layout and Containers */
 
 .create-container {
   display: flex;
@@ -27,6 +31,8 @@
   text-align: center;
   animation: floatUp 0.8s ease-out forwards;
 }
+
+/* Typography and Form Elements */
 
 .create-heading {
   font-size: 50px;
@@ -57,6 +63,8 @@
   outline: none;
   box-sizing: border-box; 
 }
+
+/* Responsive Design */
 
 @media screen and (max-width: 450px) {
   .create-heading {

@@ -1,3 +1,5 @@
+/* Profile Information */
+
 .greeting {
   font-size: 100px;
   margin: 50px 0 35px;
@@ -30,6 +32,8 @@
   padding-right: 15px;
 }
 
+/* User Settings and Admin Controls */
+
 .user-settings {
   margin: 25px 0 50px;
 }
@@ -57,6 +61,8 @@
   text-align: center;
 }
 
+/* Diary Masonry Feed */
+
 .diary-masonry-feed {
   display: flex;       
   gap: 30px;           
@@ -71,6 +77,8 @@
   flex-direction: column; 
   gap: 50px;           
 }
+
+/* Diary Card Styles */
 
 .diary-card {
   position: relative;
@@ -96,7 +104,7 @@
   gap: 15px;
 }
 
-.entry-cover img{
+.entry-cover img {
   width: 100%;
 }
 
@@ -136,6 +144,8 @@
   text-align: justify;
 }
 
+/* Form Elements and Action Buttons */
+
 strong {
   font-family: 'Glacial Indifference Bold', sans-serif;
   text-transform: uppercase;
@@ -162,13 +172,15 @@ strong {
 }
 
 .diary-delete-button {
-  border: 2 solid var(--primary-blue);
+  border: 2px solid var(--primary-blue);
 }
 
 .diary-delete-button:hover {
   background-color: var(--secondary-red);
-  border: 2 solid var(--secondary-red);
+  border: 2px solid var(--secondary-red);
 }
+
+/* Responsive Design */
 
 @media (max-width: 750px) {
   .diary-masonry-feed {

@@ -2,7 +2,9 @@ const express = require('express');
 const router = express.Router();
 const Bookshelf = require('../models/Bookshelf'); 
 
-// --- 1. GET ALL BOOKS ---
+// Get All Books
+// checks if the user is authenticated before fetching data
+// retrieves all books belonging to the user from MongoDB and sorts them by date
 router.get('/', async (req, res) => {
   try {
     if (!req.user) {
@@ -13,12 +15,13 @@ router.get('/', async (req, res) => {
     res.json(books);
 
   } catch (err) {
-    console.error("❌ GET ERROR:", err.message);
     res.status(500).json({ error: "Server Error" });
   }
 });
 
-// --- 2. ADD A BOOK ---
+// Add A Book
+// verifies login status and creates a new document in the Bookshelf collection
+// sets the default shelf to 'Want to Read' for all new entries
 router.post('/add', async (req, res) => {
   try {
     if (!req.user) return res.status(401).json({ error: "Not logged in" });
@@ -36,16 +39,17 @@ router.post('/add', async (req, res) => {
     res.json(savedBook);
 
   } catch (err) {
+    // handles the unique index error if the book already exists in the user library
     if (err.code === 11000) {
       return res.status(400).json({ error: "You already have this book in your library!" });
     }
-
-    console.error("❌ ADD ERROR:", err.message);
     res.status(500).json({ error: "Server Error: Could not save book." });
   }
 });
 
-// --- 3. UPDATE BOOK 
+// Update Book
+// searches for a specific book linked to the authenticated user ID
+// updates fields like shelf, notes, and rating based on the request body
 router.put('/:id', async (req, res) => {
   try {
     if (!req.user) return res.status(401).json({ error: "Not logged in" });
@@ -56,25 +60,26 @@ router.put('/:id', async (req, res) => {
 
     if (!book) return res.status(404).json({ msg: 'Book not found' });
 
+    // applies updates only to the fields provided in the React frontend
     if (shelf) book.shelf = shelf;
     if (notes !== undefined) book.notes = notes;
     if (memorableScene !== undefined) book.memorableScene = memorableScene;
     if (quotes !== undefined) book.quotes = quotes;
     if (rating !== undefined) book.rating = rating;
     if (dateRead !== undefined) book.dateRead = dateRead;
-    
     if (isTopPick !== undefined) book.isTopPick = isTopPick;
 
     await book.save();
     res.json(book);
 
   } catch (err) {
-    console.error("❌ UPDATE ERROR:", err.message);
     res.status(500).send('Server Error');
   }
 });
 
-// --- 4. DELETE BOOK ---
+// Delete Book
+// finds and removes the selected book from the database
+// ensures users can only delete books that belong to their own account
 router.delete('/:id', async (req, res) => {
   try {
     if (!req.user) return res.status(401).json({ error: "Not logged in" });
@@ -86,7 +91,6 @@ router.delete('/:id', async (req, res) => {
     res.json({ msg: 'Book removed' });
 
   } catch (err) {
-    console.error("❌ DELETE ERROR:", err.message);
     res.status(500).send('Server Error');
   }
 });

@@ -1,23 +1,32 @@
 import { useEffect, useState } from 'react'; 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
+// Route and Page Imports
 import AdminDashboard from './pages/AdminDashboard';
-import EntryImage from './assets/images/entry-image.png'
-import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import Search from "./pages/Search";
 import Shelves from "./pages/Shelves";
 import Dashboard from "./pages/Dashboard";
-import Footer from "./components/Footer";
 import BookDetails from "./pages/BookDetails";
 import CreateProfile from "./pages/CreateProfile"; 
 
+// Asset Imports
+import EntryImage from './assets/images/entry-image.png'
+
+// Component Imports
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
+
 function App() {
+  // manages the authenticated user data and global UI notifications
   const [user, setUser] = useState(null);
   const [alert, setAlert] = useState({ show: false, message: "", onConfirm: null });
 
+  // checks SessionStorage to see if the user has already passed the splash screen
   const [hasEntered, setHasEntered] = useState(sessionStorage.getItem('entered') === 'true');
   const [isExiting, setIsExiting] = useState(false);
 
+  // handles the transition logic when entering the main App from the splash screen
   const handleEntry = () => {
     setIsExiting(true);
     sessionStorage.setItem('entered', 'true');
@@ -26,6 +35,7 @@ function App() {
     }, 800); 
   };
 
+  // verifies if the user has an active session on the backend
   useEffect(() => {
     const getUser = async () => {
       try {
@@ -39,12 +49,13 @@ function App() {
           setUser(data); 
         }
       } catch (err) {
-        console.log("Browsing anonymously.");
+        // browsing as a guest
       }
     };
     getUser();
   }, []);
 
+  // provides a reusable way to trigger custom modals from any child component
   const triggerAlert = (message, onConfirm = null) => {
     setAlert({ show: true, message, onConfirm });
   };
@@ -55,6 +66,7 @@ function App() {
 
   return (
     <Router>
+      {/* Entry Splash Screen */}
       {!hasEntered && (
         <div 
           className={`entry-screen ${isExiting ? 'exit-fade' : ''}`} 
@@ -69,6 +81,7 @@ function App() {
 
       <Navbar user={user} />
         
+      {/* Routes */}
       <Routes>
         <Route path="/admin" element={<AdminDashboard triggerAlert={triggerAlert}/>} />
         <Route path="/" element={<Home triggerAlert={triggerAlert}/>} />
@@ -79,11 +92,13 @@ function App() {
         <Route path="/create-profile" element={<CreateProfile triggerAlert={triggerAlert}/>} />
       </Routes>
 
+      {/* Alert Modal */}
       {alert.show && (
         <div className="alert-overlay">
           <div className="alert-box">
             <p>{alert.message}</p>
             <div className="modal-footer">
+              {/* renders different buttons based on whether a confirmation action is needed */}
               {alert.onConfirm ? (
                 <>
                   <button className="cancel-button" onClick={closeAlert}>Cancel</button>

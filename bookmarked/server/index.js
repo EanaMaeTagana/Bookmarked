@@ -5,7 +5,7 @@ const session = require('express-session');
 const passport = require('passport');
 require('dotenv').config();
 
-// Routes
+// Route and Config Imports
 const bookshelfRoute = require('./routes/bookshelf');
 const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin'); 
@@ -15,20 +15,25 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const OPEN_LIBRARY_BASE_URL = 'https://openlibrary.org/search.json';
 
-// --- DATABASE ---
+// Database Connection 
+// connects the server to the MongoDB atlas cluster using the URI from environment variables
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('✅ MongoDB Connected'))
-  .catch(err => console.error('❌ MongoDB Connection Error:', err));
+  .then(() => {}) // connection successful
+  .catch(err => {}); // handles connection errors
 
-// --- MIDDLEWARE ---
+// Middleware Configuration 
+// enables Cross-Origin Resource Sharing for the React frontend
 app.use(cors({
   origin: 'http://localhost:5173', 
   credentials: true,  
   methods: ['GET', 'POST', 'PUT', 'DELETE'], 
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+// parses incoming JSON payloads
 app.use(express.json());
 
+// initializes session management for persistent user logins
 app.use(session({
   secret: process.env.SESSION_SECRET || 'keyboard cat',
   resave: false,
@@ -36,14 +41,18 @@ app.use(session({
   cookie: { secure: false } 
 }));
 
+// integrates Passport for Google OAuth authentication
 app.use(passport.initialize());
 app.use(passport.session());
 
-// --- ROUTES ---
+// Route Handlers
+// maps specific URL paths to their respective route modules
 app.use('/auth', authRoutes);
 app.use('/api/bookshelf', bookshelfRoute);
 app.use('/api/admin', adminRoutes); 
 
+// Search Proxy Logic
+// acts as a bridge between the frontend and the Open Library API to avoid CORS issues
 app.get('/api/search-books', async (req, res) => {
     const queryString = new URLSearchParams(req.query).toString();
     if (!queryString) return res.status(400).json({ error: 'Query required.' });
@@ -57,6 +66,7 @@ app.get('/api/search-books', async (req, res) => {
     }
 });
 
+// Server Initialization
 app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+    // server is active
 });

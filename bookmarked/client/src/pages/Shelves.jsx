@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom'; 
-import Header from "../components/Header.jsx";
-import HorizontalLine from "../components/HorizontalLine.jsx";
 
+// Asset Imports
 import RotatingImage from "../assets/images/rotating-image.png"; 
 import BackgroundImage from "../assets/images/background-image.png"; 
 import EditImage from "../assets/images/edit-icon.png"; 
@@ -10,18 +9,29 @@ import HeartFilled from "../assets/images/full-heart.png";
 import HeartEmpty from "../assets/images/empty-heart.png";   
 import TrashIcon from "../assets/images/trash-icon.png";     
 
+// Component Imports
+import Header from "../components/Header.jsx";
+import HorizontalLine from "../components/HorizontalLine.jsx";
+
+// Style Imports
 import '../style/Shelves.css'; 
 
 const Shelves = ({ triggerAlert }) => { 
+  // --- State ---
+  // tracks user session, the array of book objects, and initial data fetch status
   const [user, setUser] = useState(null);
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // --- Modal: Individual Book ---
+  // manages the "edit book" popup logic for moving items between shelves or deleting them
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBook, setEditingBook] = useState(null);
   const [selectedShelf, setSelectedShelf] = useState(""); 
   const [customShelfName, setCustomShelfName] = useState(""); 
 
+  // --- Modal: Shelf Management ---
+  // handles the high-level management of custom shelf names and deletions
   const [isShelfModalOpen, setIsShelfModalOpen] = useState(false);
   const [targetShelf, setTargetShelf] = useState(""); 
   const [newShelfName, setNewShelfName] = useState(""); 
@@ -32,6 +42,7 @@ const Shelves = ({ triggerAlert }) => {
     checkAuthAndFetch();
   }, []);
 
+  // verifies user session and retrieves all saved books from the database
   const checkAuthAndFetch = async () => {
     try {
       const userRes = await fetch('http://localhost:3000/auth/user', { credentials: 'include' });
@@ -50,13 +61,13 @@ const Shelves = ({ triggerAlert }) => {
         setUser(null);
       }
     } catch (err) { 
-      console.error(err); 
       setUser(null);
     } finally { 
       setLoading(false); 
     }
   };
 
+  // removes a specific book record from the database
   const handleDeleteBook = async () => {
     if (!editingBook) return;
 
@@ -65,10 +76,11 @@ const Shelves = ({ triggerAlert }) => {
           await fetch(`http://localhost:3000/api/bookshelf/${editingBook._id}`, { method: 'DELETE', credentials: 'include' });
           setBooks(books.filter(b => b._id !== editingBook._id));
           setIsModalOpen(false); 
-        } catch (err) { console.error(err); }
+        } catch (err) { }
     });
   };
 
+  // toggles the 'Top Pick' status for the dashboard highlight section
   const handleToggleHeart = async () => {
     if (!editingBook) return;
     if (!editingBook.isTopPick) {
@@ -94,6 +106,7 @@ const Shelves = ({ triggerAlert }) => {
     } catch (err) { checkAuthAndFetch(); }
   };
 
+  // updates the shelf category for a book or creates a new one
   const handleSaveShelf = async () => {
     if (!editingBook) return;
     let finalShelfName = selectedShelf;
@@ -119,6 +132,7 @@ const Shelves = ({ triggerAlert }) => {
     } catch (err) { checkAuthAndFetch(); }
   };
 
+  // deletes a custom shelf and moves all its books to the 'Want to Read' category
   const handleDeleteShelf = async () => {
     const confirmMessage = `Are you sure you want to delete the shelf "${targetShelf}"? All books will move to 'Want to Read'.`;
     
@@ -139,12 +153,12 @@ const Shelves = ({ triggerAlert }) => {
             })
           ));
         } catch (err) {
-          console.error("Error deleting shelf:", err);
           checkAuthAndFetch(); 
         }
     });
   };
 
+  // renames an existing custom shelf for all books currently assigned to it
   const handleRenameShelf = async () => {
     if (!newShelfName.trim()) {
         triggerAlert("Shelf name cannot be empty!");
@@ -167,7 +181,6 @@ const Shelves = ({ triggerAlert }) => {
         })
       ));
     } catch (err) {
-      console.error("Error renaming shelf:", err);
       checkAuthAndFetch();
     }
   };
@@ -185,9 +198,11 @@ const Shelves = ({ triggerAlert }) => {
     setIsShelfModalOpen(true);
   };
 
+  // dynamically determines all shelves (default + custom) to display
   const usedShelves = [...new Set(books.map(b => b.shelf))];
   const allShelves = [...new Set([...defaultShelves, ...usedShelves])];
 
+  {/* Loading */}
   if (loading) return <div className="no-results">
     <img className="static-rotating-image" src={RotatingImage} alt="Loading Library" />
     <p>Even our librarians are stumped. Please wait a moment.</p>
@@ -196,15 +211,24 @@ const Shelves = ({ triggerAlert }) => {
   if (!user) {
     return (
       <div className="container">
+
         <Header />
+
         <HorizontalLine />
+
+        {/* Login Required */}
         <div className="bounce-message">
+
             <img className="scroll-rotating-image" src={RotatingImage} alt="Login Required" />
+
             <h2>Please Log In</h2>
+
             <p>You need to be logged in to view your library.</p>
+
             <button className="button bounce-button" onClick={() => window.location.href = 'http://localhost:3000/auth/google'}>
                 Login with Google
             </button>
+
         </div>
       </div>
     );
@@ -216,15 +240,24 @@ const Shelves = ({ triggerAlert }) => {
             <Header />
             <HorizontalLine />
             <div className="page-container">
+
                 <h1 className="section-title">MY LIBRARY</h1>
+                
                 <hr />
+
+                {/* Empty Library */}
                 <div className="bounce-message">
+
                     <img className="scroll-rotating-image" src={RotatingImage} alt="Empty Library" />
+
                     <h2>Your library is looking a little light!</h2>
+
                     <p>Start adding books to populate your shelves.</p>
+
                     <Link to="/search" className="button bounce-button">
                         Start Exploring
                     </Link>
+
                 </div>
             </div>
         </div>
@@ -237,6 +270,8 @@ const Shelves = ({ triggerAlert }) => {
       <HorizontalLine />
 
       <div className="page-container">
+
+        {/* map through all unique shelves to display book grids */}
         {allShelves.map(shelfName => {
           const shelfBooks = books.filter(b => b.shelf === shelfName);
           if (shelfBooks.length === 0 && !defaultShelves.includes(shelfName)) return null; 
@@ -260,6 +295,7 @@ const Shelves = ({ triggerAlert }) => {
                 <hr />
               </div>
 
+              {/* flex container for the book cards within this category */}
               {shelfBooks.length > 0 ? (
                 <div className="books-container shelves-books-container">
                   {shelfBooks.map((book) => {
@@ -275,6 +311,7 @@ const Shelves = ({ triggerAlert }) => {
                               <p>{book.authors?.[0] || "Unknown"}</p>
                             </div>
                         </Link>
+                        {/* overlay icon to trigger the individual book edit modal */}
                         <img 
                           className="edit-book-button icon-image" 
                           onClick={() => openEditModal(book)} 
@@ -291,53 +328,77 @@ const Shelves = ({ triggerAlert }) => {
             </div>
           );
         })}
+
         <HorizontalLine />
+
       </div>
 
+      {/* Modal: Edit Book */}
       {isModalOpen && editingBook && (
         <div className="modal-overlay">
           <div className="modal-content">
+
             <h3>Editing "{editingBook.title}"</h3>
+
+            {/* Create New or Move to New Shelf */}
             <div className="input-group">
                 <label>Move this book to:</label>
                 <select value={selectedShelf} onChange={(e) => setSelectedShelf(e.target.value)}>
                   {allShelves.map(s => <option key={s} value={s}>{s}</option>)}
                   <option value="custom">+ Create a New Shelf</option>
                 </select>
+                {/* conditional input for typing a brand new shelf name */}
                 {selectedShelf === "custom" && (
                     <input className="modal-input" type="text" placeholder="Enter new shelf name..." autoFocus value={customShelfName} onChange={(e) => setCustomShelfName(e.target.value)} />
                 )}
             </div>
+
+            {/* Delete & Heart */}
             <div className="modal-actions-list">
               <img src={editingBook.isTopPick ? HeartFilled : HeartEmpty} onClick={handleToggleHeart} alt="Heart" className="icon-image" />
               <img src={TrashIcon} onClick={handleDeleteBook} className="icon-image" alt="Delete"/>
             </div>
+
             <hr />
+            
+            {/* Action Buttons */}
             <div className="modal-footer">
               <button className="cancel-button" onClick={() => setIsModalOpen(false)}>Cancel</button>
               <button className="button" onClick={handleSaveShelf}>Save Changes</button>
             </div>
+
           </div>
         </div>
       )}
 
+      {/* Modal: Shelf Settings */}
       {isShelfModalOpen && (
         <div className="modal-overlay">
+
           <div className="modal-content">
+
             <h3>Editing Shelf: "{targetShelf}"</h3>
+
+            {/* Rename */}
             <div className="input-group">
               <label>Rename this shelf to:</label>
               <input className="modal-input" type="text" value={newShelfName} onChange={(e) => setNewShelfName(e.target.value)}/>
             </div>
+
+            {/* Delete */}
             <div className="modal-actions-list shelf-modal">
               <img src={TrashIcon} onClick={handleDeleteShelf} className="icon-image" alt="Delete"/>
               <p>(Books will be moved to 'Want to Read')</p>
             </div>
+
             <hr />
+
+            {/* Action Buttons */}
             <div className="modal-footer">
               <button className="cancel-button" onClick={() => setIsShelfModalOpen(false)}>Cancel</button>
               <button className="button" onClick={handleRenameShelf}>Save Name</button>
             </div>
+
           </div>
         </div>
       )}

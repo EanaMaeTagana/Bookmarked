@@ -1,30 +1,38 @@
 import React, { useState, useEffect, useRef } from 'react'; 
 import { Link, useLocation } from "react-router-dom";
+
+// Asset Imports
 import LoginImage from "../assets/images/login-icon.png";
 import LogoutImage from "../assets/images/logout-icon.png";
+
+// Style Imports
 import "../style/Navbar.css";
 
 function Navbar({ user, loading }) {
+  // manages visibility of the user dropdown and the mobile navigation links
   const [menuOpen, setMenuOpen] = useState(false); 
   const [mobileLinksOpen, setMobileLinksOpen] = useState(false);
   
-  const userMenuRef = useRef(); // Specifically for the Login/Logout dropdown
-  const mobileNavRef = useRef(); // Specifically for the Hamburger and Nav Links
+  // ref hooks for handling clicks outside the menus
+  const userMenuRef = useRef(); // specifically for the Login/Logout dropdown
+  const mobileNavRef = useRef(); // specifically for the Hamburger and Nav Links
   
   const location = useLocation();
   const API_BASE_URL = 'http://localhost:3000';
 
+  // redirects user to the Google OAuth backend route
   const handleAuth = () => {
     window.location.href = `${API_BASE_URL}/auth/google`;
   };
 
+  // closes menus when the user clicks anywhere else on the screen
   useEffect(() => {
     const handleClickOutside = (event) => {
-      // Close user dropdown if clicking outside its container
+      // close user dropdown if clicking outside its container
       if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
         setMenuOpen(false);
       }
-      // Close mobile hamburger menu if clicking outside the hamburger or the links
+      // close mobile Hamburger menu if clicking outside the Hamburger or the links
       if (mobileNavRef.current && !mobileNavRef.current.contains(event.target)) {
         setMobileLinksOpen(false);
       }
@@ -34,18 +42,21 @@ function Navbar({ user, loading }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // auto-close menus when the URL path changes
   useEffect(() => {
     setMenuOpen(false);
     setMobileLinksOpen(false);
   }, [location]);
 
+  // hide the Navbar during the profile creation onboarding step
   if (location.pathname === '/create-profile') {
     return null; 
   }
 
   return (
     <nav>
-      {/* Wrap Hamburger and Links in a ref to detect outside clicks */}
+      {/* Mobile Navigation*/}
+      {/* wrap hamburger and links in a ref to detect outside clicks */}
       <div className="mobile-nav-container" ref={mobileNavRef}>
         <button 
           className="hamburger" 
@@ -65,6 +76,7 @@ function Navbar({ user, loading }) {
         </div>
       </div>
 
+      {/* User Actions - Login/Logout Dropdown */}
       <div className="nav-actions" ref={userMenuRef}>
         {loading ? (
             <div className="nav-spinner"></div>
@@ -77,8 +89,10 @@ function Navbar({ user, loading }) {
             />
         )}
 
+        {/* Auth Dropdown */}
         {menuOpen && (
           <div className="dropdown-menu">
+            
             {!user ? (
               <div className="auth-dropdown-content">
                 <p className="dropdown-label">Join Bookmarked</p>

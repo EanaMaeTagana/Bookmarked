@@ -12,13 +12,15 @@ import Header from "../components/Header.jsx";
 import HorizontalLine from "../components/HorizontalLine.jsx";  
 import Pagination from "../components/Pagination.jsx"; 
 
+// Style Imports
 import "../style/Search.css";
 
 const BACKEND_URL = "http://localhost:3000"; 
 const BOOKS_PER_PAGE = 20;
 
 function Search({ triggerAlert }) {
-  // --- STATE ---
+  
+  // store book data and search filters
   const [books, setBooks] = useState([]);
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
@@ -26,19 +28,22 @@ function Search({ triggerAlert }) {
   const [page, setPage] = useState(1);
   const [numFound, setNumFound] = useState(0);
 
-  // --- SEARCH LOGIC ---
+  // logic to wait for the user to stop typing before searching
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedQuery(query), 300);
     return () => clearTimeout(timer);
   }, [query]);
 
+  // reset page to 1 whenever search text or category changes
   useEffect(() => setPage(1), [debouncedQuery, category]);
 
+  // handle search button click or enter key
   const handleSearchSubmit = () => {
     setDebouncedQuery(query);
     setPage(1);
   };
 
+  // create the link for the api call based on search or category
   const buildApiUrl = useCallback(() => {
     const params = new URLSearchParams();
     params.append("page", page);
@@ -53,6 +58,7 @@ function Search({ triggerAlert }) {
     return `${BACKEND_URL}/api/search-books?${params.toString()}`;
   }, [page, debouncedQuery, category]);
 
+  // fetch book data from the backend
   const fetchBooks = useCallback(async () => {
     try {
       const url = buildApiUrl();
@@ -61,6 +67,7 @@ function Search({ triggerAlert }) {
       const docs = res.data.docs || [];
       const totalHits = res.data.numFound ? Number(res.data.numFound) : docs.length;
       
+      // sort books by the newest release year
       const sorted = docs.sort((a, b) => (b.first_publish_year || 0) - (a.first_publish_year || 0));
       
       setBooks(sorted); 
@@ -71,18 +78,23 @@ function Search({ triggerAlert }) {
     }
   }, [buildApiUrl, triggerAlert]);
 
+  // trigger fetchBooks whenever the built url changes
   useEffect(() => { fetchBooks(); }, [fetchBooks]);
 
+  // calculate the last page number for pagination
   const lastPage = Math.min(Math.ceil(numFound / BOOKS_PER_PAGE), 50);
 
   return (
     <div className="container">
+      {/* Search Page Header */}
       <Header />
       <HorizontalLine />
+      
       <div className="page-container">
         <h1 className="section-title">Discover</h1>
         <hr />
         
+        {/* Search Controls - genre filters and search bar */}
         <div className="search-controls"> 
           <div className="genre-filters">
             <select value={category} onChange={(e) => setCategory(e.target.value)}> 
@@ -112,6 +124,7 @@ function Search({ triggerAlert }) {
           </div>
         </div> 
 
+        {/* Books Grid */}
         <div className="books-container" key={`${category}-${page}`}> 
           {books.length > 0 ? ( 
             books.map((book, index) => ( 
@@ -138,6 +151,7 @@ function Search({ triggerAlert }) {
               </Link>
             )) 
           ) : ( 
+            /* Loading/No Results Message */
             <div className="no-results">
               <img className="static-rotating-image" src={RotatingImage} alt="Empty Library" />
               <p>Even our librarians are stumped. Please wait a moment.</p>
@@ -145,6 +159,7 @@ function Search({ triggerAlert }) {
           )} 
         </div> 
 
+        {/* Pagination Controls */}
         <Pagination page={page} lastPage={lastPage} setPage={setPage} />
       </div>
       <HorizontalLine />

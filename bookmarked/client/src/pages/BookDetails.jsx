@@ -1,21 +1,30 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import Header from "../components/Header.jsx";
-import RotatingImage from "../assets/images/rotating-image.png"; 
-import HorizontalLine from "../components/HorizontalLine.jsx";
-import "../style/BookDetails.css";
 import axios from "axios";
+
+// Asset Imports
+import RotatingImage from "../assets/images/rotating-image.png"; 
+
+// Component Imports
+import Header from "../components/Header.jsx";
+import HorizontalLine from "../components/HorizontalLine.jsx";
+
+// Style Imports
+import "../style/BookDetails.css";
 
 function BookDetails({ triggerAlert }) {
   const { olid } = useParams();
   const navigate = useNavigate();
 
+  // state for book metadata and loading status
   const [book, setBook] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // tracks if the book is already in the user's database
   const [savedBookId, setSavedBookId] = useState(null);
 
+  // manages the reading diary form inputs
   const [diaryForm, setDiaryForm] = useState({
     notes: "", 
     quotes: "",
@@ -25,13 +34,16 @@ function BookDetails({ triggerAlert }) {
 
   const CHAR_LIMIT = 1000;
 
+  // fetch detailed book info from Open Library and check if it's already saved
   useEffect(() => {
     const fetchBookData = async () => {
       try {
         setLoading(true);
+        // Step 1: Get general book details
         const res = await axios.get(`https://openlibrary.org/works/${olid}.json`);
         const bookData = res.data;
 
+        // Step 2: Fetch the author's name using the key provided in the book data
         let authorNames = ["Unknown Author"];
         if (bookData.authors?.length > 0) {
           const authorRes = await axios.get(`https://openlibrary.org${bookData.authors[0].author.key}.json`);
@@ -40,6 +52,7 @@ function BookDetails({ triggerAlert }) {
 
         setBook({ ...bookData, authorNames });
 
+        // Step 3: Check if this user already has this book saved to their account
         try {
           const myBooksRes = await axios.get('http://localhost:3000/api/bookshelf', { withCredentials: true });
           const existingBook = myBooksRes.data.find(b => b.bookId === olid);
@@ -54,11 +67,10 @@ function BookDetails({ triggerAlert }) {
             });
           }
         } catch (authErr) {
-          console.log("Browsing as guest: Bookshelf data hidden.");
+          // guest user - no saved data to retrieve
         }
 
       } catch (err) {
-        console.error(err);
         setError("We couldn't find this volume in our archives.");
       } finally {
         setLoading(false);
@@ -67,6 +79,7 @@ function BookDetails({ triggerAlert }) {
     fetchBookData();
   }, [olid]);
 
+  // logic to save a book to the database before adding diary notes
   const addToBookshelf = async () => {
     try {
       const coverUrl = book.covers
@@ -94,6 +107,7 @@ function BookDetails({ triggerAlert }) {
     }
   };
 
+  // validates and saves diary entries to the bookshelf collection
   const handleSaveDiary = async () => {
     const isFormEmpty = !diaryForm.notes.trim() && 
                         !diaryForm.quotes.trim() && 
@@ -113,6 +127,7 @@ function BookDetails({ triggerAlert }) {
     try {
       let currentId = savedBookId;
 
+      // if the book isn't saved yet, save it first, then attach the diary entry
       if (!currentId) {
         currentId = await addToBookshelf();
         setSavedBookId(currentId);
@@ -129,12 +144,12 @@ function BookDetails({ triggerAlert }) {
       if (err.message === "Unauthorized") {
         triggerAlert("This diary is private. Please log in so we can save these notes to your account.");
       } else {
-        console.error(err);
         triggerAlert("The archives are being stubborn. Your notes could not be saved, please try again.");
       }
     }
   };
 
+  // loading state while fetching external API data
   if (loading) return (
     <div className="loading-screen">
       <img className="static-rotating-image" src={RotatingImage} alt="Loading" />
@@ -155,10 +170,12 @@ function BookDetails({ triggerAlert }) {
         <Header />
         <HorizontalLine />
 
+        {/* Back Navigation */}
         <div className="back-button-wrapper">
             <button className="back-button button" onClick={() => navigate(-1)}>Back</button>
         </div>
 
+        {/* Book Details Section */}
         <div className="details-section">
           <div className="book-cover">
             <img src={coverUrl} alt={book.title} />
@@ -177,6 +194,7 @@ function BookDetails({ triggerAlert }) {
           </div>
         </div>
 
+        {/* Add to Shelf */}
         {!savedBookId && (
         <button className="details-buttons button" onClick={async () => {
           try {
@@ -193,9 +211,11 @@ function BookDetails({ triggerAlert }) {
         </button>
         )}
 
+        {/* Reading Diary Section */}
         <div className="diary-section">
           <h2>Loved this read? <br />Record it in your digital diary.</h2>
           
+          {/* Note */}
           <div className="note-form">
             <label>What made this book unputdownable? ({diaryForm.notes.length}/{CHAR_LIMIT})</label>
             <textarea 
@@ -207,6 +227,7 @@ function BookDetails({ triggerAlert }) {
             />
           </div>
 
+          {/* Quote */}
           <div className="quote-form">
             <label>Which quotes stuck with you? ({diaryForm.quotes.length}/{CHAR_LIMIT})</label>
             <textarea 
@@ -219,6 +240,8 @@ function BookDetails({ triggerAlert }) {
           </div>
 
           <div className="date-rating-form">
+
+            {/* Date */}
             <div className="date-form">
               <label>When did you read this book?</label>
               <input 
@@ -228,6 +251,7 @@ function BookDetails({ triggerAlert }) {
                 />
             </div>
 
+            {/* Rating */}
             <div className="rating-form">
               <label>How would you rate this book? (0-10)</label>
               <input 
@@ -239,6 +263,7 @@ function BookDetails({ triggerAlert }) {
           </div>
         </div>
 
+        {/* Save to Diary */}
         <button className="details-buttons button" onClick={handleSaveDiary}>
           + Save to Diary
         </button>
