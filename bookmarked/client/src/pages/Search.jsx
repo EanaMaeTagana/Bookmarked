@@ -19,22 +19,20 @@ function Search() {
   const [page, setPage] = useState(1);
   const [numFound, setNumFound] = useState(0);
 
-  // 1. Debounce Logic
+  // Debounce logic for search input
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedQuery(query), 300);
     return () => clearTimeout(timer);
   }, [query]);
 
-  // 2. Reset page on new search
+  // Reset page on new search or category change
   useEffect(() => setPage(1), [debouncedQuery, category]);
 
-  // 3. Define the Missing Function
   const handleSearchSubmit = () => {
     setDebouncedQuery(query);
     setPage(1);
   };
 
-  // 4. API Logic
   const buildApiUrl = useCallback(() => {
     const params = new URLSearchParams();
     params.append("page", page);
@@ -49,7 +47,6 @@ function Search() {
     return `${BACKEND_URL}/api/search-books?${params.toString()}`;
   }, [page, debouncedQuery, category]);
 
-  // 5. Fetch Logic
   const fetchBooks = useCallback(async () => {
     try {
       const url = buildApiUrl();
@@ -63,7 +60,7 @@ function Search() {
       setBooks(sorted); 
       setNumFound(Math.min(totalHits, 1000));
     } catch (err) {
-      console.error("Error fetching books:", err.message);
+      console.error("Our catalog is a bit messy right now. Please try again later.", err.message);
       setBooks([]);
     }
   }, [buildApiUrl]);
@@ -74,7 +71,6 @@ function Search() {
 
   return (
     <div className="container">
-
       <Header />
       <HorizontalLine />
       <div className="page-container">
@@ -82,7 +78,6 @@ function Search() {
         <hr />
         
         <div className="search-controls"> 
-
           <div className="genre-filters">
             <select value={category} onChange={(e) => setCategory(e.target.value)}> 
               <option value="fiction">ALL</option> 
@@ -95,6 +90,7 @@ function Search() {
 
           <div className="search-input-wrapper">
             <input 
+              className="search-input"
               type="text" 
               placeholder="Search books by title or author..." 
               value={query} 
@@ -108,16 +104,16 @@ function Search() {
               alt="Search"
             />
           </div>
-
         </div> 
 
-        <div className="books-container"> 
+        <div className="books-container" key={`${category}-${page}`}> 
           {books.length > 0 ? ( 
             books.map((book, index) => ( 
               <Link 
                 to={`/book/${book.key.replace("/works/", "")}`} 
                 key={book.key || index} 
                 className="book-card"
+                style={{ animationDelay: `${index * 0.05}s` }} 
               > 
                 <div 
                   className="book-cover-wrapper"
@@ -136,16 +132,13 @@ function Search() {
               </Link>
             )) 
           ) : ( 
-            <div className="no-results">No results found</div>
+            <div className="no-results">Even our librarians are stumped. Try another title.</div>
           )} 
         </div> 
 
         <Pagination page={page} lastPage={lastPage} setPage={setPage} />
-
-
       </div>
       <HorizontalLine />
-
     </div> 
   ); 
 } 

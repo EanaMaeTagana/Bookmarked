@@ -6,6 +6,7 @@
 
   --primary-blue: #366baa;
   --secondary-red: #a43030;
+  --secondary-yellow: #ebb75f;
 
   margin: 0;
   padding: 0;
@@ -36,9 +37,12 @@ body {
   font-size: 20px;
   line-height: 2;
   background-color: var(--background);
+  background-image: url('./assets/images/website-background.png');
+  background-repeat: repeat; 
+  background-size: 200px 200px; 
+  background-attachment: fixed; 
   color: var(--primary-blue);
 }
-
 
 .container {
   max-width: 1280px;
@@ -52,7 +56,6 @@ h1 {
 
 h2 {
   font-family: 'Glacial Indifference Bold', Arial, Helvetica, sans-serif;
-  font-size: clamp(1rem, 4.5vw, 5rem);
   line-height: 1;
 }
 
@@ -70,9 +73,10 @@ h2 {
 }
 
 .button:hover {
-  background-color: transparent;
-  color: var(--primary-blue);
+  background-color: var(--secondary-yellow);
+  color: var(--text-white);
   transform: scale(1.1); 
+  border: 2px solid var(--secondary-yellow);  
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);    
 }
 
@@ -80,5 +84,10 @@ h2 {
   margin-bottom: 100px;
 }
 
+@media screen and (max-width: 450px) {
+  .button {
+    font-size: 14px;
+ }
+}
 
 

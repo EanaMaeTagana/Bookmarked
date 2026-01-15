@@ -29,7 +29,7 @@ hr {
     background-color: var(--primary-blue);
     color: var(--text-white);
     appearance: none;
-
+    cursor: pointer;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 20px center; 
@@ -41,10 +41,6 @@ hr {
     transition: transform 0.3s;
 }
 
-.genre-filters select:focus {
-    outline: none;
-}
-
 .search-input-wrapper {
     display: flex;
     gap: 5px;
@@ -53,8 +49,12 @@ hr {
     width: 50%;
 }
 
+.search-input {
+    height: fit-content;
+}
+
 .search-controls input {
-    padding: 10px 15px 10px 15px;
+    padding: 10px 15px;
     border: 2px solid var(--primary-blue);
     border-radius: 50px;
     width: 100%;
@@ -62,6 +62,8 @@ hr {
     font-size: 15px;
     color: var(--text-grey);
 }
+
+/* --- GRID & INDIVIDUAL CARD STYLING --- */
 
 .books-container {
     margin: 50px 0;
@@ -74,18 +76,18 @@ hr {
     display: flex;
     flex-direction: column;
     align-items: center;
+    text-decoration: none;
+    /* Entrance Animation */
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.4s ease-out forwards;
 }
 
-.book-cover-wrapper img:hover {
-    transform: scale(1.1) rotate(-5.5deg);
-    transition: transform 0.5s;
-}
-
-.book-card img {
-    height: 100%; 
-    max-width: 180px;
-    object-fit: contain; 
-    
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .book-cover-wrapper { 
@@ -93,10 +95,28 @@ hr {
     width: 180px;
     margin: 0 auto;
     padding: 50px 20px 0;
-    border-radius: 100px;
+    border-radius: 100px; /* Oval Look */
     background-size: cover;
     border: 2px solid var(--primary-blue);
-    box-shadow: 5px 5px 0px rgba(54, 107, 170, 0.2)
+    box-shadow: 5px 5px 0px rgba(54, 107, 170, 0.2);
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out; 
+}
+
+.book-card img {
+    height: 100%; 
+    max-width: 180px;
+    object-fit: contain; 
+    transition: transform 0.5s ease;
+}
+
+/* --- THE HOVER ANIMATIONS --- */
+.book-card:hover .book-cover-wrapper {
+    transform: translateY(-8px);
+    box-shadow: 8px 8px 0px rgba(54, 107, 170, 0.1);
+}
+
+.book-card:hover img {
+    transform: scale(1.1) rotate(-5.5deg); 
 }
 
 .book-details {
@@ -106,10 +126,6 @@ hr {
     text-transform: uppercase;
 }
 
-.books-container a {
-    text-decoration: none;
-}
-
 .book-card h3 {
     color: var(--primary-blue);
     font-family: 'Glacial Indifference Bold', Arial, Helvetica, sans-serif;
@@ -117,16 +133,17 @@ hr {
     font-weight: bold;
     margin: 5px 0 0;
     line-height: 1;
+    text-align: center;
 }
 
 .book-card p {
     color: var(--primary-blue);
-    text-decoration: none;
     padding: 0 15px;
     margin-top: 8px;
     line-height: 1.2;
     font-style: italic;
     font-size: 13px;
+    text-align: center;
 }
 
 .no-cover {
@@ -139,52 +156,46 @@ hr {
     color: var(--text-grey);
 }
 
+.no-results {
+    grid-column: 1 / -1; /* Centers it across the whole grid */
+    text-align: center;
+    font-size: 1.2rem;
+    color: var(--text-grey);
+    margin-top: 50px;
+    font-family: 'Glacial Indifference', Arial, sans-serif;
+}
 
+/* --- PAGINATION STYLING --- */
 
 .pagination {
     display: flex;
     justify-content: center;
     gap: 20px;
     align-items: center;
+    margin-top: 50px;
 }
 
 .pagination button {
     font-family: 'Glacial Indifference', Arial, Helvetica, sans-serif;
     font-size: 1rem;
     color: var(--primary-blue);
-    margin: 0 5px;
     padding: 10px 15px;
     border-radius: 50px;
     border: 2px solid var(--background);
     background: none;
     cursor: pointer;
+    transition: all 0.2s;
 }
 
-.pagination button:hover {
-    transform: scale(1.5);
-    transition: transform 0.2s;
-}
-
-.pagination button:disabled {
-    cursor: not-allowed;
+.pagination button:hover:not(:disabled) {
+    transform: scale(1.2);
+    border-color: var(--primary-blue);
 }
 
 .pagination button.active {
     background: var(--primary-blue);
     color: var(--text-white);
     border-color: var(--primary-blue);
-}
-
-.no-results {
-    grid-column: 1 / -1;
-    text-align: center;
-    font-size: 1rem;
-    color: var(--text-grey);
-}
-
-.header-image {
-    width: 45%;
-    padding-bottom: 30px;
 }
 
 @media (max-width: 1140px) {

@@ -26,13 +26,13 @@ const AdminDashboard = () => {
       setLoading(false);
     } catch (err) {
       console.error(err);
-      alert("Access Denied: Admins Only");
+      alert("Restricted Area: This section of the library is for authorized staff only.");
       navigate('/dashboard'); 
     }
   };
 
   const handleDeleteUser = async (id) => {
-    if(!confirm("Are you sure? This deletes the user and ALL their data permanently.")) return;
+    if(!confirm("Are you sure you want to revoke this library card? This will permanently erase the user's entire collection and diary.")) return;
     
     try {
       await axios.delete(`http://localhost:3000/api/admin/users/${id}`, { withCredentials: true });
@@ -41,9 +41,9 @@ const AdminDashboard = () => {
       
       setStats(prev => ({ ...prev, totalUsers: prev.totalUsers - 1 }));
 
-      alert("User deleted successfully.");
+      alert("User successfully removed.");
     } catch (err) {
-      alert("Failed to delete user.");
+      alert("We couldn't delete this user—please try again.");
     }
   };
 

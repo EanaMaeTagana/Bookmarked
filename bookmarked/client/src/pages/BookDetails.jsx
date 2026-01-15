@@ -26,6 +26,7 @@ function BookDetails() {
     const fetchBookData = async () => {
       try {
         setLoading(true);
+        // Fetch Public Data
         const res = await axios.get(`https://openlibrary.org/works/${olid}.json`);
         const bookData = res.data;
 
@@ -37,22 +38,26 @@ function BookDetails() {
 
         setBook({ ...bookData, authorNames });
 
-        const myBooksRes = await axios.get('http://localhost:3000/api/bookshelf', { withCredentials: true });
-        const existingBook = myBooksRes.data.find(b => b.bookId === olid);
+        try {
+          const myBooksRes = await axios.get('http://localhost:3000/api/bookshelf', { withCredentials: true });
+          const existingBook = myBooksRes.data.find(b => b.bookId === olid);
 
-        if (existingBook) {
-          setSavedBookId(existingBook._id);
-          setDiaryForm({
-            notes: existingBook.notes || existingBook.memorableScene || "", // Handles new or old data
-            quotes: existingBook.quotes || "",
-            dateRead: existingBook.dateRead ? existingBook.dateRead.split('T')[0] : "",
-            rating: existingBook.rating || ""
-          });
+          if (existingBook) {
+            setSavedBookId(existingBook._id);
+            setDiaryForm({
+              notes: existingBook.notes || existingBook.memorableScene || "",
+              quotes: existingBook.quotes || "",
+              dateRead: existingBook.dateRead ? existingBook.dateRead.split('T')[0] : "",
+              rating: existingBook.rating || ""
+            });
+          }
+        } catch (authErr) {
+          console.log("Browsing as guest: Bookshelf data hidden.");
         }
 
       } catch (err) {
         console.error(err);
-        setError("Failed to load details");
+        setError("We couldn't find this volume in our archives.");
       } finally {
         setLoading(false);
       }
@@ -76,6 +81,10 @@ function BookDetails() {
       const res = await axios.post("http://localhost:3000/api/bookshelf/add", payload, { withCredentials: true });
       return res.data._id; 
     } catch (err) {
+      if (err.response?.status === 401) {
+        alert("You'll need to log in to save books to your personal shelf.");
+        throw new Error("Unauthorized");
+      }
       if (err.response?.status === 400) {
         return savedBookId; 
       }
@@ -96,16 +105,21 @@ function BookDetails() {
         withCredentials: true
       });
 
-      alert("Diary updated successfully!");
+      alert("Your thoughts have been safely recorded into your digital diary.");
       navigate('/dashboard');
 
     } catch (err) {
-      console.error(err);
-      alert("Error saving diary. Please try again.");
+      if (err.message === "Unauthorized") {
+        alert("This diary is private. Please log in so we can save these notes to your account.");
+      } else {
+        console.error(err);
+        alert("The archives are being stubborn. Your notes could not be saved, please try again.");
+      }
     }
   };
 
-  if (loading) return <div className="loading-screen">Loading Book Details...</div>;
+  if (loading) return <div className="loading-screen">Dusting off the archives...</div>;
+  if (error) return <div className="error-screen">{error}</div>;
   if (!book) return <div className="error-screen">Book not found.</div>;
 
   const coverId = book.covers ? book.covers[0] : null;
@@ -113,14 +127,11 @@ function BookDetails() {
 
   return (
     <div className="container">
-
       <div className="page-container">
         <Header />
-
         <HorizontalLine />
 
         <div className="details-section">
-          
           <div className="book-cover">
             <img src={coverUrl} alt={book.title} className="simple-book-cover" />
           </div>
@@ -130,7 +141,6 @@ function BookDetails() {
               <h1 className="book-title">{book.title}</h1>
               <h3 className="book-author">{book.authorNames.join(", ")}</h3>
             </div>
-            
             <p className="book-description">
               {typeof book.description === 'string' 
               ? book.description 
@@ -144,8 +154,12 @@ function BookDetails() {
           try {
               const id = await addToBookshelf();
               setSavedBookId(id);
-              alert("✅ Added to shelf!");
-          } catch(e) { alert("Error adding book"); }
+              alert("This book has been officially added to your personal library.");
+          } catch(e) { 
+              if (e.message !== "Unauthorized") {
+                alert("The shelf is a bit dusty. We couldn't add this book right now."); 
+              }
+          }
         }}>
           + ADD TO SHELVES
         </button>
@@ -153,13 +167,13 @@ function BookDetails() {
 
         <div className="diary-section">
           <h2>Loved this read? <br />Record it in your digital diary.</h2>
-              
           <div className="note-form">
             <label>What made this book unputdownable?</label>
             <textarea 
               rows="4"
               value={diaryForm.notes}
               onChange={(e) => setDiaryForm({...diaryForm, notes: e.target.value})}
+              placeholder="Start writing your thoughts..."
             />
           </div>
 
@@ -169,6 +183,7 @@ function BookDetails() {
               rows="4"
               value={diaryForm.quotes}
               onChange={(e) => setDiaryForm({...diaryForm, quotes: e.target.value})}
+              placeholder="'The best of a book is not the thought which it contains...'"
             />
           </div>
 
@@ -191,18 +206,14 @@ function BookDetails() {
               />
             </div>
           </div>
-
         </div>
 
         <button className="button" onClick={handleSaveDiary}>
-          + ADD TO DASHBOARD DIARY
+          + SAVE TO DIARY
         </button>
       </div>
-
       <HorizontalLine />
-
     </div>
-    
   );
 }
 

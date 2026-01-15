@@ -26,7 +26,7 @@ function App() {
           setUser(data); 
         }
       } catch (err) {
-        console.log("Not logged in");
+        console.log("Browsing anonymously.");
       }
     };
 
