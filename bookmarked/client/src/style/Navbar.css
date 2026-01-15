@@ -34,6 +34,7 @@ nav a {
 }
 
 nav a:hover {
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.221);  
     color: var(--text-white);
     background-color: var(--secondary-yellow);
     transform: scale(1.1); 
@@ -107,6 +108,7 @@ nav a:hover {
 }
 
 .continue-button:hover {
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.221);  
     background: var(--secondary-yellow);
     color: var(--text-white);
 }
@@ -125,9 +127,15 @@ nav a:hover {
 }
 
 .logout-button:hover {
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.221);  
     background: transparent;
     color: var(--secondary-red);
     border: solid 2px var(--secondary-red);
+}
+
+.mobile-nav-container {
+    display: flex;
+    align-items: center;
 }
 
 @keyframes dropdownFadeIn {
@@ -142,6 +150,10 @@ nav a:hover {
 }
 
 @media (max-width: 850px) {
+    nav {
+        margin: 0 0 20px;
+    }
+
     .hamburger {
         display: flex;
     }
@@ -185,7 +197,15 @@ nav a:hover {
 
     .continue-button, 
     .logout-button {
+        padding: 4px 10px;
         font-size: 10px;
+    }
+
+    .icon-image {
+        height: 22px !important;
+        width: 22px !important;
+        cursor: pointer;
+        transition: transform 0.3s ease;
     }
 }
 

@@ -1,17 +1,24 @@
 import { useState, useEffect, useCallback } from "react"; 
 import { Link } from "react-router-dom";
 import axios from "axios";
+
+// Asset Imports
+import RotatingImage from "../assets/images/rotating-image.png"; 
 import BackgroundImage from "../assets/images/background-image.png";
 import SearchImage from "../assets/images/search-icon.png";
+
+// Component Imports
 import Header from "../components/Header.jsx";
 import HorizontalLine from "../components/HorizontalLine.jsx";  
 import Pagination from "../components/Pagination.jsx"; 
+
 import "../style/Search.css";
 
 const BACKEND_URL = "http://localhost:3000"; 
 const BOOKS_PER_PAGE = 20;
 
-function Search() {
+function Search({ triggerAlert }) {
+  // --- STATE ---
   const [books, setBooks] = useState([]);
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
@@ -19,13 +26,12 @@ function Search() {
   const [page, setPage] = useState(1);
   const [numFound, setNumFound] = useState(0);
 
-  // Debounce logic for search input
+  // --- SEARCH LOGIC ---
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedQuery(query), 300);
     return () => clearTimeout(timer);
   }, [query]);
 
-  // Reset page on new search or category change
   useEffect(() => setPage(1), [debouncedQuery, category]);
 
   const handleSearchSubmit = () => {
@@ -60,10 +66,10 @@ function Search() {
       setBooks(sorted); 
       setNumFound(Math.min(totalHits, 1000));
     } catch (err) {
-      console.error("Our catalog is a bit messy right now. Please try again later.", err.message);
+      triggerAlert("Our catalog is a bit messy right now. Please try again later.");
       setBooks([]);
     }
-  }, [buildApiUrl]);
+  }, [buildApiUrl, triggerAlert]);
 
   useEffect(() => { fetchBooks(); }, [fetchBooks]);
 
@@ -80,11 +86,11 @@ function Search() {
         <div className="search-controls"> 
           <div className="genre-filters">
             <select value={category} onChange={(e) => setCategory(e.target.value)}> 
-              <option value="fiction">ALL</option> 
-              <option value="romance">ROMANCE</option> 
-              <option value="mystery">MYSTERY</option> 
-              <option value="fantasy">FANTASY</option> 
-              <option value="nonfiction">NON-FICTION</option> 
+              <option value="fiction">All</option> 
+              <option value="romance">Romance</option> 
+              <option value="mystery">Mystery</option> 
+              <option value="fantasy">Fantasy</option> 
+              <option value="nonfiction">Non-Fiction</option> 
             </select> 
           </div>
 
@@ -132,7 +138,10 @@ function Search() {
               </Link>
             )) 
           ) : ( 
-            <div className="no-results">Even our librarians are stumped. Try another title.</div>
+            <div className="no-results">
+              <img className="static-rotating-image" src={RotatingImage} alt="Empty Library" />
+              <p>Even our librarians are stumped. Please wait a moment.</p>
+            </div>
           )} 
         </div> 
 

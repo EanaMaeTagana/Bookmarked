@@ -4,9 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import '../style/AdminDashboard.css'; 
 import HorizontalLine from "../components/HorizontalLine.jsx";
 
-const AdminDashboard = () => {
+const AdminDashboard = ({ triggerAlert }) => {
 
-  const [stats, setStats] = useState({ totalUsers: 0, totalBooks: 0 });
+  const [totalUsers, setTotalUsers] = useState(0);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -18,7 +18,8 @@ const AdminDashboard = () => {
   const fetchAdminData = async () => {
     try {
       const statsRes = await axios.get('http://localhost:3000/api/admin/stats', { withCredentials: true });
-      setStats(statsRes.data);
+
+      setTotalUsers(statsRes.data.totalUsers);
 
       const usersRes = await axios.get('http://localhost:3000/api/admin/users', { withCredentials: true });
       setUsers(usersRes.data);
@@ -26,105 +27,98 @@ const AdminDashboard = () => {
       setLoading(false);
     } catch (err) {
       console.error(err);
-      alert("Restricted Area: This section of the library is for authorized staff only.");
+      triggerAlert("Restricted Area: This section of the library is for authorized staff only.");
       navigate('/dashboard'); 
     }
   };
 
-  const handleDeleteUser = async (id) => {
-    if(!confirm("Are you sure you want to revoke this library card? This will permanently erase the user's entire collection and diary.")) return;
-    
-    try {
-      await axios.delete(`http://localhost:3000/api/admin/users/${id}`, { withCredentials: true });
-      
-      setUsers(users.filter(u => u._id !== id));
-      
-      setStats(prev => ({ ...prev, totalUsers: prev.totalUsers - 1 }));
+  const handleDeleteUser = (id) => {
+    triggerAlert("Are you sure you want to revoke this library card? This action is permanent.", async () => {
+      try {
+        await axios.delete(`http://localhost:3000/api/admin/users/${id}`, { withCredentials: true });
+        
+        setUsers(users.filter(u => u._id !== id));
+        setTotalUsers(prev => prev - 1);
 
-      alert("User successfully removed.");
-    } catch (err) {
-      alert("We couldn't delete this user—please try again.");
-    }
+        triggerAlert("User successfully removed.");
+      } catch (err) {
+        triggerAlert("The archives resisted. We couldn't delete this user—please try again.");
+      }
+    });
   };
 
-  if (loading) return <div className="loading">Loading Admin Panel...</div>;
+  if (loading) return (
+    <div className="isolated-container">
+       <div className="admin-loading">Consulting the Grand Archivist...</div>
+    </div>
+  );
 
   return (
-
-    <div>
+    <div className="isolated-container">
       
-          <HorizontalLine/>
+      <HorizontalLine />
 
       <div className="admin-container">
-
         <header className="admin-header">
-          <h1>Admin Panel</h1>
+          <h1>Bookmarked: Staff Archives</h1>
         </header>
 
-        <button className="exit-admin-button" onClick={() => navigate('/dashboard')}>Exit to Dashboard</button>
+        <div className="admin-actions-bar">
+           <button className="button exit-admin-button" onClick={() => navigate('/dashboard')}>
+             Return to Dashboard
+           </button>
+        </div>
 
-        <div className="stats-row">
-          
+        <div className="stats-row single-stat">
           <div className="stat-card">
-            <h3>Total Users</h3>
-            <p>{stats.totalUsers}</p>
-          </div>
-
-          <div className="stat-card">
-            <h3>Total Books Saved</h3>
-            <p>{stats.totalBooks}</p>
+            <h3>Total Registered Readers</h3>
+            <p>{totalUsers}</p>
           </div>
         </div>
 
         <div className="user-table-section">
-          <h2>Registered Users</h2>
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Joined</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map(u => (
-                <tr key={u._id}>
-                  <td>
-                    <div className="user-info">
-                      {u.displayName}
-                    </div>
-                  </td>
-                  <td>{u.email}</td>
-                  <td>
-                    <span className={`role-badge ${u.role}`}>
-                      {u.role.toUpperCase()}
-                    </span>
-                  </td>
-                  <td>{new Date(u.createdAt).toLocaleDateString()}</td>
-                  <td>
-                    {u.role !== 'admin' && (
-                      <button 
-                        className="delete-user-button" 
-                        onClick={() => handleDeleteUser(u._id)}
-                      >
-                        DELETE
-                      </button>
-                    )}
-                  </td>
+          <h2>Registry of Members</h2>
+          <div className="table-responsive-wrapper">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Status</th>
+                  <th>Joined</th>
+                  <th>Management</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {users.map(u => (
+                  <tr key={u._id}>
+                    <td><div className="user-info">{u.displayName}</div></td>
+                    <td>{u.email}</td>
+                    <td>
+                      <span className={`role-badge ${u.role}`}>
+                        {u.role.toUpperCase()}
+                      </span>
+                    </td>
+                    <td>{new Date(u.createdAt).toLocaleDateString()}</td>
+                    <td>
+                      {u.role !== 'admin' && (
+                        <button 
+                          className="delete-user-button" 
+                          onClick={() => handleDeleteUser(u._id)}
+                        >
+                          Revoke Access
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-
-
       </div>
-      
 
-      <HorizontalLine/>
-
+      <HorizontalLine />
     </div>
   );
 };

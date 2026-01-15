@@ -1,4 +1,5 @@
 .bounce-message {
+  padding-top: 60px;
   height: 500px;
   flex-direction: column;
   display: flex;    
@@ -7,9 +8,25 @@
   align-items: center;
 }
 
+.scroll-rotating-image {
+    height: 100px;
+    margin-bottom: 15px;
+    animation: rotate-on-scroll linear;
+    animation-timeline: scroll(root);
+}
+
+@keyframes rotate-on-scroll {
+    from {
+        transform: rotate(0deg) scale(0.5);
+    }
+    to {
+        transform: rotate(360deg) scale(1.5);
+    }
+}
+
 .bounce-message h2 {
-  font-family: "New Icon";
   margin: 0;
+  color: var(--text-grey);
 }
 
 .bounce-message p {
@@ -28,6 +45,7 @@
 }
 
 .modal-overlay {
+  padding: 15px;
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(0, 0, 0, 0.5); 
@@ -114,6 +132,10 @@
   margin: 0;
 }
 
+.book-card a {
+  text-decoration: none;
+}
+
 .book-card .icon-image {
   visibility: hidden;
   opacity: 0;
@@ -145,8 +167,68 @@
 
 .empty-shelf {
   text-align: center;
-  margin-top: 100px;
+  margin: 120px 0;
   color: var(--text-grey);
   font-style: italic;
   font-size: 15px;
 }
+
+@media screen and (max-width: 850px) {
+
+  .bounce-message {
+      gap: 5px;
+  }
+
+  .scroll-rotating-image {
+    height: 35px;
+    margin-bottom: 10px;
+    animation: rotate-animation 10s linear infinite;
+  }
+
+  .modal-content h3 {
+    font-size: 20px;
+  }
+
+  .modal-content label {
+    font-size: 15px;
+  }
+
+  .modal-content select, .modal-input {
+    font-size: 12px;
+  }
+
+  .modal-actions-list {
+    gap: 5px;
+  }
+
+  .cancel-button {
+    font-size: 10px;
+    padding: 4px 20px;
+  }
+
+  .shelf-modal p {
+    font-size: 12px;
+  } 
+
+  .empty-shelf{
+    font-size: 12px;
+  }
+
+}
+
+@media screen and (max-width: 650px) {
+  .book-card .icon-image {
+    visibility: visible;
+    opacity: 0.2;
+    position: relative; 
+  }
+
+  .book-card:active .icon-image {
+    opacity: 1;
+  }
+
+  .shelves-books-container {
+    margin-top: 0;
+  }
+}
+

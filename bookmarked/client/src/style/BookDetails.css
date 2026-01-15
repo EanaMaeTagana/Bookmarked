@@ -1,3 +1,24 @@
+.book-details-container {
+  margin-bottom: 80px;
+}
+
+.back-button {
+  display: block;
+  margin: 80px 0 0 auto;
+}
+
+.loading-screen {
+    grid-column: 1 / -1; 
+    text-align: center;
+    color: var(--text-grey);
+    margin: 300px 0;
+    font-family: 'Glacial Indifference', Arial, sans-serif;
+}
+
+.loading-screen p {
+  font-size: 1rem;
+}
+
 .details-section {
   margin: 50px 0;
   display: flex;
@@ -7,7 +28,7 @@
   background-color: var(--text-white);
   color: var(--primary-blue);
   border: 2px solid var(--primary-blue);
-  border-radius: 100px;
+  border-radius: 50px;
 }
 
 .book-cover img {
@@ -29,13 +50,15 @@
 
 .book-details-info .book-title {
   font-family: 'Glacial Indifference Bold', sans-serif;
+  font-size: 50px;
   text-transform: uppercase;
   text-align: left;
   margin: 0;
 }
 
-.book-details-info h3 {
+.book-details-info .book-author {
   text-align: left;
+  font-size: 30px;
   font-style: italic;
   text-transform: uppercase;
   margin: 0;
@@ -56,7 +79,11 @@
   flex-direction: column;
   color: var(--text-white);
   background-color: var(--primary-blue);
-  border-radius: 100px;
+  border-radius: 50px;
+}
+
+.diary-section label {
+  margin-bottom: 4px;
 }
 
 .diary-section h2 {
@@ -97,3 +124,78 @@ textarea, input {
   flex-direction: column;
   text-align: left;
 }
+
+@media screen and (max-width: 850px) {
+  .book-details-container {
+    margin-bottom: 40px;
+  }
+
+  .back-button {
+    display: block;
+    margin: 30px 0 0 auto;
+  }
+
+  .details-section {
+    margin: 25px 0;
+    padding: 25px;
+    gap: 20px
+  }
+
+  .book-cover img {
+    height: 35vw;
+  }
+
+  .book-details-info .book-title {
+    font-size: 25px;    
+  }
+
+  .book-details-info .book-author {
+    font-size: 18px;
+  }
+
+  .diary-section {
+    margin: 25px 0;
+    padding: 25px;
+  }
+
+  .diary-section label, .diary-section textarea, .date-form input, .rating-form input {
+    font-size: 14px;
+  }
+}
+
+@media screen and (max-width: 550px) {
+  .date-rating-form {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .diary-section label, .diary-section textarea, .date-form input, .rating-form input {
+    font-size: 12px;
+    border-radius: 15px;
+  }
+
+  .diary-section textarea, .date-form input, .rating-form input {
+    padding: 12px;
+    height: 15px;
+  }
+}
+
+@media screen and (max-width: 450px) {
+  .details-section {
+    display: grid;
+  }
+
+  .book-cover img {
+    height: 50vw;
+  }
+
+  .book-details-info .book-title, .book-details-info .book-author {
+    text-align: center; 
+  }
+
+  .book-details-info .book-author {
+    font-size: 15px;
+  }
+
+}
+

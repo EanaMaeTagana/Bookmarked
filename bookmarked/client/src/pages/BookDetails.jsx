@@ -1,11 +1,12 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Header from "../components/Header.jsx";
+import RotatingImage from "../assets/images/rotating-image.png"; 
 import HorizontalLine from "../components/HorizontalLine.jsx";
 import "../style/BookDetails.css";
 import axios from "axios";
 
-function BookDetails() {
+function BookDetails({ triggerAlert }) {
   const { olid } = useParams();
   const navigate = useNavigate();
 
@@ -22,11 +23,12 @@ function BookDetails() {
     rating: ""
   });
 
+  const CHAR_LIMIT = 1000;
+
   useEffect(() => {
     const fetchBookData = async () => {
       try {
         setLoading(true);
-        // Fetch Public Data
         const res = await axios.get(`https://openlibrary.org/works/${olid}.json`);
         const bookData = res.data;
 
@@ -82,7 +84,7 @@ function BookDetails() {
       return res.data._id; 
     } catch (err) {
       if (err.response?.status === 401) {
-        alert("You'll need to log in to save books to your personal shelf.");
+        triggerAlert("You'll need to log in to save books to your personal shelf.");
         throw new Error("Unauthorized");
       }
       if (err.response?.status === 400) {
@@ -93,6 +95,21 @@ function BookDetails() {
   };
 
   const handleSaveDiary = async () => {
+    const isFormEmpty = !diaryForm.notes.trim() && 
+                        !diaryForm.quotes.trim() && 
+                        !diaryForm.dateRead && 
+                        !diaryForm.rating;
+
+    if (isFormEmpty) {
+      triggerAlert("Your diary entry is empty! Please write something before saving.");
+      return;
+    }
+
+    if (diaryForm.notes.length > CHAR_LIMIT || diaryForm.quotes.length > CHAR_LIMIT) {
+      triggerAlert(`You seem to have a lot of thoughts! Entries must be under ${CHAR_LIMIT} characters.`);
+      return;
+    }
+
     try {
       let currentId = savedBookId;
 
@@ -105,35 +122,46 @@ function BookDetails() {
         withCredentials: true
       });
 
-      alert("Your thoughts have been safely recorded into your digital diary.");
+      triggerAlert("Your thoughts have been safely recorded into your digital diary.");
       navigate('/dashboard');
 
     } catch (err) {
       if (err.message === "Unauthorized") {
-        alert("This diary is private. Please log in so we can save these notes to your account.");
+        triggerAlert("This diary is private. Please log in so we can save these notes to your account.");
       } else {
         console.error(err);
-        alert("The archives are being stubborn. Your notes could not be saved, please try again.");
+        triggerAlert("The archives are being stubborn. Your notes could not be saved, please try again.");
       }
     }
   };
 
-  if (loading) return <div className="loading-screen">Dusting off the archives...</div>;
+  if (loading) return (
+    <div className="loading-screen">
+      <img className="static-rotating-image" src={RotatingImage} alt="Loading" />
+      <p>Dusting off the archives...</p>
+    </div>
+  );
+
   if (error) return <div className="error-screen">{error}</div>;
-  if (!book) return <div className="error-screen">Book not found.</div>;
+  if (!book) return <div className="error-screen">Book not found in archives.</div>;
 
   const coverId = book.covers ? book.covers[0] : null;
   const coverUrl = coverId ? `https://covers.openlibrary.org/b/id/${coverId}-L.jpg` : "https://via.placeholder.com/150";
 
   return (
     <div className="container">
-      <div className="page-container">
+      <div className="book-details-container">
+
         <Header />
         <HorizontalLine />
 
+        <div className="back-button-wrapper">
+            <button className="back-button button" onClick={() => navigate(-1)}>Back</button>
+        </div>
+
         <div className="details-section">
           <div className="book-cover">
-            <img src={coverUrl} alt={book.title} className="simple-book-cover" />
+            <img src={coverUrl} alt={book.title} />
           </div>
 
           <div className="book-details-info">
@@ -150,27 +178,29 @@ function BookDetails() {
         </div>
 
         {!savedBookId && (
-        <button className="button" onClick={async () => {
+        <button className="details-buttons button" onClick={async () => {
           try {
               const id = await addToBookshelf();
               setSavedBookId(id);
-              alert("This book has been officially added to your personal library.");
+              triggerAlert("This book has been added to your personal library!");
           } catch(e) { 
               if (e.message !== "Unauthorized") {
-                alert("The shelf is a bit dusty. We couldn't add this book right now."); 
+                triggerAlert("The shelf is a bit dusty. We couldn't add this book right now."); 
               }
           }
         }}>
-          + ADD TO SHELVES
+          + Add to Shelves
         </button>
         )}
 
         <div className="diary-section">
           <h2>Loved this read? <br />Record it in your digital diary.</h2>
+          
           <div className="note-form">
-            <label>What made this book unputdownable?</label>
+            <label>What made this book unputdownable? ({diaryForm.notes.length}/{CHAR_LIMIT})</label>
             <textarea 
               rows="4"
+              maxLength={CHAR_LIMIT}
               value={diaryForm.notes}
               onChange={(e) => setDiaryForm({...diaryForm, notes: e.target.value})}
               placeholder="Start writing your thoughts..."
@@ -178,9 +208,10 @@ function BookDetails() {
           </div>
 
           <div className="quote-form">
-            <label>Which quotes stuck with you?</label>
+            <label>Which quotes stuck with you? ({diaryForm.quotes.length}/{CHAR_LIMIT})</label>
             <textarea 
               rows="4"
+              maxLength={CHAR_LIMIT}
               value={diaryForm.quotes}
               onChange={(e) => setDiaryForm({...diaryForm, quotes: e.target.value})}
               placeholder="'The best of a book is not the thought which it contains...'"
@@ -208,8 +239,8 @@ function BookDetails() {
           </div>
         </div>
 
-        <button className="button" onClick={handleSaveDiary}>
-          + SAVE TO DIARY
+        <button className="details-buttons button" onClick={handleSaveDiary}>
+          + Save to Diary
         </button>
       </div>
       <HorizontalLine />

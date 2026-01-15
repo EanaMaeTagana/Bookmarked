@@ -1,17 +1,18 @@
 .greeting {
-  font-size: clamp(3rem, 6vw, 10rem);
+  font-size: 100px;
   margin: 50px 0 35px;
 }
 
 .account-stats {
   padding: 25px;
-  width: max-width;
+  width: 100%;
   border: 2px solid var(--primary-blue);
-  border-radius: 50px;
+  border-radius: 25px;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   background: var(--text-white);
   color: var(--primary-blue);
+  box-sizing: border-box;
 }
 
 .account-stats p {
@@ -41,11 +42,13 @@
 }
 
 .admin-button:hover {
+  border: 2px solid var(--secondary-red);
   background-color: transparent;
   color: var(--secondary-red);
 }
 
 .empty-message {
+  margin-top: 100px;
   color: var(--text-grey);
   font-size: 25px;
   font-style: italic;
@@ -54,14 +57,10 @@
   text-align: center;
 }
 
-.empty-diary {
-  margin-top: 100px;
-}
-
 .diary-masonry-feed {
   display: flex;       
-  gap: 50px;           
-  margin: 80px 0;
+  gap: 30px;           
+  margin: 60px 0;
   align-items: flex-start;
   width: 100%;
 }
@@ -86,6 +85,11 @@
   transition: all 0.3s ease;
 }
 
+.diary-card:hover {
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.221);
+  transform: translateY(-5px);
+}
+
 .diary-content-top {
   display: grid;
   grid-template-columns: 1fr 2fr;
@@ -99,7 +103,7 @@
 .entry-title {
   font-family: 'Glacial Indifference Bold', sans-serif;
   height: fit-content;
-  font-size: 35px;
+  font-size: 30px;
   text-align: left;
   text-transform: uppercase;
   line-height: 1;
@@ -109,14 +113,14 @@
 
 .entry-notes {
   text-align: justify;
-  font-size: 18px;
+  font-size: 15px;
   margin: 10px 0 0 0;
   padding: 0;
   line-height: 1.8;
 }
 
 .entry-date {
-  font-size: 20px;
+  font-size: 18px;
   margin: 10px 0 0 0;  
   text-align: left;
   font-style: italic;
@@ -128,7 +132,8 @@
 }
 
 .diary-content-bottom p {
-  font-size: 16px;
+  font-size: 15px;
+  text-align: justify;
 }
 
 strong {
@@ -136,14 +141,17 @@ strong {
   text-transform: uppercase;
 }
 
+.diary-note-input, .diary-quote-input {
+  height: 80px;
+}
+
 .diary-card .edit-diary-button {
   position: absolute;
-  top: 50%;
-  left: 46%;
+  top: 48%;
+  left: 45%;
   opacity: 0;
   visibility: hidden;
   transition: all 0.3s ease; 
-  transform: scale(1.5);
   border-radius: 100px;
   border: 10px solid var(--text-white); 
 }
@@ -153,21 +161,97 @@ strong {
   visibility: visible;
 }
 
-.diary-profile-actions {
-  margin: 40px 0 10px;
-}
-
 .diary-delete-button {
-  background-color: var(--secondary-red);
-  color: var(--text-white);
-  border: 2px solid var(--secondary-red);
+  border: 2 solid var(--primary-blue);
 }
 
 .diary-delete-button:hover {
-  background-color: transparent;
-  color: var(--secondary-red);
+  background-color: var(--secondary-red);
+  border: 2 solid var(--secondary-red);
 }
 
-.dashboard-hr {
-  margin: 30px 0;
+@media (max-width: 750px) {
+  .diary-masonry-feed {
+    flex-direction: column; 
+    gap: 30px;
+    margin: 30px 0;
+  }
+
+  .masonry-column {
+    width: 100%;
+    gap: 30px;
+  }
+
+  .diary-card {
+    padding: 30px;
+    border-radius: 35px;
+  }
+
+  .entry-title { 
+    font-size: 25px; 
+  }
+
+  .diary-card .edit-diary-button {
+    opacity: 0.2;
+    visibility: visible;
+    top: 5px;
+    right: 5px;
+    left: auto;
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 650px) {
+  .account-stats {
+    padding: 15px;
+    grid-template-columns: 1fr;
+    border-radius: 30px;
+    gap: 15px;
+  }
+
+  .greeting {
+    font-size: 60px;
+    margin: 40px 0 20px;
+  }
+
+  .account-stats p {
+    font-size: 12px;
+  }
+
+  .stat-left {
+    padding-right: 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--primary-blue);
+  }
+
+  .user-settings {
+    justify-content: center;
+    display: flex;
+    gap: 10px;
+    margin: 12px 0 50px;
+  } 
+
+  .admin-button {
+    margin-left: 0;
+  }
+
+  .top-four-container {
+    margin: 10px 0 30px;
+  }
+
+  .entry-title { 
+    font-size: 18px;       
+  }
+
+  .entry-notes {
+    font-size: 12px;
+  } 
+
+  .entry-date {
+    font-size: 14px;
+  }
+
+  .diary-content-bottom p {
+    font-size: 12px;
+  }
 }

@@ -7,7 +7,10 @@ import "../style/Navbar.css";
 function Navbar({ user, loading }) {
   const [menuOpen, setMenuOpen] = useState(false); 
   const [mobileLinksOpen, setMobileLinksOpen] = useState(false);
-  const menuRef = useRef(); 
+  
+  const userMenuRef = useRef(); // Specifically for the Login/Logout dropdown
+  const mobileNavRef = useRef(); // Specifically for the Hamburger and Nav Links
+  
   const location = useLocation();
   const API_BASE_URL = 'http://localhost:3000';
 
@@ -17,10 +20,16 @@ function Navbar({ user, loading }) {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
+      // Close user dropdown if clicking outside its container
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
         setMenuOpen(false);
       }
+      // Close mobile hamburger menu if clicking outside the hamburger or the links
+      if (mobileNavRef.current && !mobileNavRef.current.contains(event.target)) {
+        setMobileLinksOpen(false);
+      }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
@@ -36,24 +45,27 @@ function Navbar({ user, loading }) {
 
   return (
     <nav>
-      <button 
-        className="hamburger" 
-        onClick={() => setMobileLinksOpen(!mobileLinksOpen)}
-        aria-label="Toggle navigation"
-      >
-        <span className={`bar ${mobileLinksOpen ? 'open' : ''}`}></span>
-        <span className={`bar ${mobileLinksOpen ? 'open' : ''}`}></span>
-        <span className={`bar ${mobileLinksOpen ? 'open' : ''}`}></span>
-      </button>
+      {/* Wrap Hamburger and Links in a ref to detect outside clicks */}
+      <div className="mobile-nav-container" ref={mobileNavRef}>
+        <button 
+          className="hamburger" 
+          onClick={() => setMobileLinksOpen(!mobileLinksOpen)}
+          aria-label="Toggle navigation"
+        >
+          <span className={`bar ${mobileLinksOpen ? 'open' : ''}`}></span>
+          <span className={`bar ${mobileLinksOpen ? 'open' : ''}`}></span>
+          <span className={`bar ${mobileLinksOpen ? 'open' : ''}`}></span>
+        </button>
 
-      <div className={`nav-links ${mobileLinksOpen ? "mobile-active" : ""}`}>
-        <Link to="/">Home</Link>
-        <Link to="/search">Search</Link>
-        <Link to="/shelves">Shelves</Link>
-        <Link to="/dashboard">Dashboard</Link>
+        <div className={`nav-links ${mobileLinksOpen ? "mobile-active" : ""}`}>
+          <Link to="/">Home</Link>
+          <Link to="/search">Search</Link>
+          <Link to="/shelves">Shelves</Link>
+          <Link to="/dashboard">Dashboard</Link>
+        </div>
       </div>
 
-      <div className="nav-actions" ref={menuRef}>
+      <div className="nav-actions" ref={userMenuRef}>
         {loading ? (
             <div className="nav-spinner"></div>
         ) : (

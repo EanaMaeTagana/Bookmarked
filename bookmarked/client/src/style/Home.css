@@ -54,19 +54,33 @@ p {
   line-height: 1.6;
 }
 
+.get-started-button {
+  padding: 10px 50px;
+  margin-top: 50px;
+}
+
 @media (max-width: 850px) {
   .explore, .organize, .digitize {
-    margin: 40px 0;
+    margin: 80px 0;
   }
 
   .explore-image {
     width: 100%;
     transform: scale(1.1);
-    margin: 20px 0;
+    margin: 10px 0;
+  }
+
+  .organize-image {
+    margin: 10px 0 0;
   }
 
   br {
     display: none;
+  }
+
+  .get-started-button {
+    padding: 4px 50px;
+    margin-top: 20px;
   }
 
 

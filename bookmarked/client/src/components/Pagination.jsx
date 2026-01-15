@@ -22,7 +22,7 @@ const Pagination = ({ page, lastPage, setPage }) => {
       key="prev" 
       onClick={() => setPage(page - 1)} 
       disabled={page === 1}
-      className="nav-btn"
+      className="page-navigation-button"
     >
       Previous
     </button>
@@ -53,7 +53,7 @@ const Pagination = ({ page, lastPage, setPage }) => {
       key="next" 
       onClick={() => setPage(page + 1)} 
       disabled={page === lastPage}
-      className="nav-btn"
+      className="page-navigation-button"
     >
       Next
     </button>
