@@ -5,7 +5,7 @@ const session = require('express-session');
 const passport = require('passport');
 require('dotenv').config();
 
-// route and config imports
+// Route and Config Imports
 const bookshelfRoute = require('./routes/bookshelf');
 const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin'); 
@@ -15,16 +15,16 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const OPEN_LIBRARY_BASE_URL = 'https://openlibrary.org/search.json';
 
-// database connection
+// Database Connection 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('MongoDB connected')) 
   .catch(err => console.error('Connection error:', err));
 
-// middleware configuration 
+// Middleware Configuration 
 app.use(cors({
   origin: [
     'http://localhost:5173', 
-    'https://bookmarkedarchive.vercel.app' 
+    'https://bookmarked-ui.vercel.app' 
   ], 
   credentials: true,  
   methods: ['GET', 'POST', 'PUT', 'DELETE'], 
@@ -33,7 +33,7 @@ app.use(cors({
 
 app.use(express.json());
 
-// session Management
+// Session Management
 app.use(session({
   secret: process.env.SESSION_SECRET || 'keyboard cat',
   resave: false,
@@ -48,11 +48,12 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-// route Handlers
+// Route Handlers
 app.use('/auth', authRoutes);
 app.use('/api/bookshelf', bookshelfRoute);
 app.use('/api/admin', adminRoutes); 
 
+// Search Proxy
 app.get('/api/search-books', async (req, res) => {
     const queryString = new URLSearchParams(req.query).toString();
     if (!queryString) return res.status(400).json({ error: 'Query required.' });
@@ -65,11 +66,12 @@ app.get('/api/search-books', async (req, res) => {
     }
 });
 
-// server initialization
+// Server Initialization
 if (process.env.NODE_ENV !== 'production') {
     app.listen(PORT, () => {
         console.log(`Server is running on http://localhost:${PORT}`);
     });
 }
 
+// Export for Vercel
 module.exports = app;
