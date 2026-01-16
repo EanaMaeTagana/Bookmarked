@@ -3,7 +3,6 @@ const passport = require('passport');
 const router = express.Router();
 const User = require('../models/Users.js'); 
 
-// Google Authentication
 // triggers the Google login flow to begin the authentication process
 // asks the User to choose a specific account via the Google prompt
 router.get('/google',
@@ -20,15 +19,14 @@ router.get('/google/callback',
   passport.authenticate('google', { failureRedirect: '/' }),
   (req, res) => {
     // determine the next step based on the User registration status
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
     if (req.user.isNew) {
-      res.redirect('http://localhost:5173/create-profile');
+      res.redirect(`${frontendUrl}/create-profile`);
     } else {
-      res.redirect('http://localhost:5173/dashboard');
+      res.redirect(`${frontendUrl}/dashboard`);
     }
   }
 );
-
-
 
 // Create User Profile
 // verifies that a valid Google session exists before allowing profile creation
@@ -92,8 +90,9 @@ router.get('/logout', (req, res, next) => {
   req.logout((err) => {
     if (err) { return next(err); }
     // clears the server session store and redirects to the landing page
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
     req.session.destroy(() => {
-      res.redirect('http://localhost:5173/');
+      res.redirect(`${frontendUrl}/`);
     });
   });
 });
