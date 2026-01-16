@@ -23,8 +23,7 @@ mongoose.connect(process.env.MONGO_URI)
 // Middleware Configuration 
 app.use(cors({
   origin: [
-    'http://localhost:5173', 
-    'https://bookmarked-frontend.vercel.app'
+    'https://bookmarked-frontend.vercel.app/'
   ], 
   credentials: true,  
   methods: ['GET', 'POST', 'PUT', 'DELETE'], 
