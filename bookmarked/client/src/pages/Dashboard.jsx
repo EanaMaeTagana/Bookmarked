@@ -14,6 +14,8 @@ import EditImage from "../assets/images/edit-icon.png";
 // Style Imports
 import '../style/Dashboard.css';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 const Dashboard = ({ triggerAlert }) => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
@@ -48,7 +50,7 @@ const Dashboard = ({ triggerAlert }) => {
   // pulls the authenticated user profile and their full library from the backend
   const fetchData = async () => {
     try {
-      const userRes = await axios.get('http://localhost:3000/auth/user', { withCredentials: true });
+      const userRes = await axios.get(`${API_BASE_URL}/auth/user`, { withCredentials: true });
       if (userRes.data && userRes.data.email) {
         setUser(userRes.data);
         setProfileForm({
@@ -60,7 +62,7 @@ const Dashboard = ({ triggerAlert }) => {
       } else {
         setUser(null);
       }
-      const bookRes = await axios.get('http://localhost:3000/api/bookshelf', { withCredentials: true });
+      const bookRes = await axios.get(`${API_BASE_URL}/api/bookshelf`, { withCredentials: true });
       setBooks(bookRes.data);
     } catch (err) {
       setUser(null); 
@@ -72,7 +74,7 @@ const Dashboard = ({ triggerAlert }) => {
   // submits updated profile information to the database
   const handleSaveProfile = async () => {
     try {
-      const res = await axios.put('http://localhost:3000/auth/update-profile', profileForm, { withCredentials: true });
+      const res = await axios.put(`${API_BASE_URL}/auth/update-profile`, profileForm, { withCredentials: true });
       setUser(res.data); 
       setIsProfileModalOpen(false);
       triggerAlert("Profile updated!");
@@ -86,7 +88,7 @@ const Dashboard = ({ triggerAlert }) => {
   const handleDeleteAccount = () => {
     triggerAlert("Are you sure? This will permanently delete your account and all your book data.", async () => {
       try {
-        await axios.delete('http://localhost:3000/auth/delete-account', { withCredentials: true });
+        await axios.delete(`${API_BASE_URL}/auth/delete-account`, { withCredentials: true });
         // Redirect to home after deletion
         window.location.href = "/";
       } catch (err) {
@@ -114,7 +116,7 @@ const Dashboard = ({ triggerAlert }) => {
       const updatedBooks = books.map(b => b._id === editingEntry._id ? { ...b, ...diaryForm } : b);
       setBooks(updatedBooks);
       setIsDiaryModalOpen(false);
-      await axios.put(`http://localhost:3000/api/bookshelf/${editingEntry._id}`, diaryForm, { withCredentials: true });
+      await axios.put(`${API_BASE_URL}/api/bookshelf/${editingEntry._id}`, diaryForm, { withCredentials: true });
       triggerAlert("Entry saved!");
     } catch (err) {
       fetchData(); 
@@ -130,7 +132,7 @@ const Dashboard = ({ triggerAlert }) => {
           const updatedBooks = books.map(b => b._id === editingEntry._id ? { ...b, ...emptyData } : b);
           setBooks(updatedBooks);
           setIsDiaryModalOpen(false);
-          await axios.put(`http://localhost:3000/api/bookshelf/${editingEntry._id}`, emptyData, { withCredentials: true });
+          await axios.put(`${API_BASE_URL}/api/bookshelf/${editingEntry._id}`, emptyData, { withCredentials: true });
           triggerAlert("Entry cleared.");
         } catch (err) {
           fetchData();
@@ -154,7 +156,7 @@ const Dashboard = ({ triggerAlert }) => {
             <img className="scroll-rotating-image" src={RotatingImage} alt="Login Required" />
             <h2>Please Log In</h2>
             <p>You need to be logged in to view your dashboard.</p>
-            <button className="button bounce-button" onClick={() => window.location.href = 'http://localhost:3000/auth/google'}>Login with Google</button>
+            <button className="button bounce-button" onClick={() => window.location.href = `${API_BASE_URL}/auth/google`}></button>
         </div>
       </div>
     );

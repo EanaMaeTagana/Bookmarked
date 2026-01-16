@@ -6,6 +6,8 @@ import axios from 'axios';
 import "../style/CreateProfile.css";
 import '../App.css'; 
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 const CreateProfile = () => {
   const [nickname, setNickname] = useState('');
   const [loading, setLoading] = useState(false);
@@ -21,8 +23,7 @@ const CreateProfile = () => {
     setError('');
 
     try {
-      // sends the chosen nickname to the backend to complete the registration
-      const response = await axios.post('http://localhost:3000/auth/create-profile', 
+      const response = await axios.post(`${API_BASE_URL}/auth/create-profile`, 
         { nickname: nickname }, 
         { withCredentials: true } 
       );

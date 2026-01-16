@@ -8,6 +8,8 @@ import LogoutImage from "../assets/images/logout-icon.png";
 // Style Imports
 import "../style/Navbar.css";
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 function Navbar({ user, loading }) {
   // manages visibility of the user dropdown and the mobile navigation links
   const [menuOpen, setMenuOpen] = useState(false); 
@@ -18,10 +20,10 @@ function Navbar({ user, loading }) {
   const mobileNavRef = useRef(); // specifically for the Hamburger and Nav Links
   
   const location = useLocation();
-  const API_BASE_URL = 'http://localhost:3000';
 
   // redirects user to the Google OAuth backend route
   const handleAuth = () => {
+    // UPDATED: Used ${API_BASE_URL}
     window.location.href = `${API_BASE_URL}/auth/google`;
   };
 
@@ -103,6 +105,7 @@ function Navbar({ user, loading }) {
             ) : (
               <div className="auth-dropdown-content">
                 <p className="dropdown-label">User: {user.nickname || user.displayName}</p>
+                {/* UPDATED: Used ${API_BASE_URL} for Logout */}
                 <button className="logout-button" onClick={() => window.location.href = `${API_BASE_URL}/auth/logout`}>
                   Logout
                 </button>

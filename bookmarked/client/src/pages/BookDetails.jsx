@@ -12,6 +12,8 @@ import HorizontalLine from "../components/HorizontalLine.jsx";
 // Style Imports
 import "../style/BookDetails.css";
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 function BookDetails({ triggerAlert }) {
   const { olid } = useParams();
   const navigate = useNavigate();
@@ -54,7 +56,7 @@ function BookDetails({ triggerAlert }) {
 
         // Step 3: Check if this user already has this book saved to their account
         try {
-          const myBooksRes = await axios.get('http://localhost:3000/api/bookshelf', { withCredentials: true });
+          const myBooksRes = await axios.get(`${API_BASE_URL}/api/bookshelf`, { withCredentials: true });
           const existingBook = myBooksRes.data.find(b => b.bookId === olid);
 
           if (existingBook) {
@@ -93,7 +95,8 @@ function BookDetails({ triggerAlert }) {
         coverImage: coverUrl
       };
 
-      const res = await axios.post("http://localhost:3000/api/bookshelf/add", payload, { withCredentials: true });
+      // UPDATED: Used ${API_BASE_URL}
+      const res = await axios.post(`${API_BASE_URL}/api/bookshelf/add`, payload, { withCredentials: true });
       return res.data._id; 
     } catch (err) {
       if (err.response?.status === 401) {
@@ -133,7 +136,7 @@ function BookDetails({ triggerAlert }) {
         setSavedBookId(currentId);
       }
 
-      await axios.put(`http://localhost:3000/api/bookshelf/${currentId}`, diaryForm, {
+      await axios.put(`${API_BASE_URL}/api/bookshelf/${currentId}`, diaryForm, {
         withCredentials: true
       });
 

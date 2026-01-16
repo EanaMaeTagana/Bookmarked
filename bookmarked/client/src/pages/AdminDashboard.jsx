@@ -8,6 +8,10 @@ import HorizontalLine from "../components/HorizontalLine.jsx";
 // Style Imports
 import '../style/AdminDashboard.css'; 
 
+// This variable tells the app to use your Vercel backend URL if it exists, 
+// otherwise it falls back to localhost for when you are working at home.
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 const AdminDashboard = ({ triggerAlert }) => {
 
   // tracks the aggregate count and the list of individual member records
@@ -24,11 +28,11 @@ const AdminDashboard = ({ triggerAlert }) => {
   // pulls Admin stats and the full member registry from the backend API
   const fetchAdminData = async () => {
     try {
-      const statsRes = await axios.get('http://localhost:3000/api/admin/stats', { withCredentials: true });
+      const statsRes = await axios.get(`${API_BASE_URL}/api/admin/stats`, { withCredentials: true });
 
       setTotalUsers(statsRes.data.totalUsers);
 
-      const usersRes = await axios.get('http://localhost:3000/api/admin/users', { withCredentials: true });
+      const usersRes = await axios.get(`${API_BASE_URL}/api/admin/users`, { withCredentials: true });
       setUsers(usersRes.data);
       
       setLoading(false);
@@ -43,7 +47,7 @@ const AdminDashboard = ({ triggerAlert }) => {
   const handleDeleteUser = (id) => {
     triggerAlert("Are you sure you want to revoke this library card? This action is permanent.", async () => {
       try {
-        await axios.delete(`http://localhost:3000/api/admin/users/${id}`, { withCredentials: true });
+        await axios.delete(`${API_BASE_URL}/api/admin/users/${id}`, { withCredentials: true });
         
         setUsers(users.filter(u => u._id !== id));
         setTotalUsers(prev => prev - 1);

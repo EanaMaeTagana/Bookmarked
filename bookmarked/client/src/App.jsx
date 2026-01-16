@@ -17,6 +17,9 @@ import EntryImage from './assets/images/entry-image.png'
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
+// UPDATED: This variable handles the switch between local and Vercel
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 function App() {
   // manages the authenticated user data and global UI notifications
   const [user, setUser] = useState(null);
@@ -39,7 +42,7 @@ function App() {
   useEffect(() => {
     const getUser = async () => {
       try {
-        const response = await fetch("http://localhost:3000/auth/user", {
+        const response = await fetch(`${API_BASE_URL}/auth/user`, {
           method: "GET",
           credentials: "include", 
         });

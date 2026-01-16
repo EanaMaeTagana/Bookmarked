@@ -15,7 +15,7 @@ import Pagination from "../components/Pagination.jsx";
 // Style Imports
 import "../style/Search.css";
 
-const BACKEND_URL = "http://localhost:3000"; 
+const BACKEND_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 const BOOKS_PER_PAGE = 20;
 
 function Search({ triggerAlert }) {

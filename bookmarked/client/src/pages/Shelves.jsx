@@ -16,6 +16,8 @@ import HorizontalLine from "../components/HorizontalLine.jsx";
 // Style Imports
 import '../style/Shelves.css'; 
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 const Shelves = ({ triggerAlert }) => { 
   // --- State ---
   // tracks user session, the array of book objects, and initial data fetch status
@@ -45,13 +47,13 @@ const Shelves = ({ triggerAlert }) => {
   // verifies user session and retrieves all saved books from the database
   const checkAuthAndFetch = async () => {
     try {
-      const userRes = await fetch('http://localhost:3000/auth/user', { credentials: 'include' });
+      const userRes = await fetch(`${API_BASE_URL}/auth/user`, { credentials: 'include' });
       
       if (userRes.ok) {
         const userData = await userRes.json();
         if (userData && userData.email) {
           setUser(userData);
-          const bookRes = await fetch('http://localhost:3000/api/bookshelf', { credentials: 'include' });
+          const bookRes = await fetch(`${API_BASE_URL}/api/bookshelf`, { credentials: 'include' });
           const bookData = await bookRes.json();
           setBooks(Array.isArray(bookData) ? bookData : []);
         } else {
@@ -73,7 +75,7 @@ const Shelves = ({ triggerAlert }) => {
 
     triggerAlert(`Remove "${editingBook.title}" from your library?`, async () => {
         try {
-          await fetch(`http://localhost:3000/api/bookshelf/${editingBook._id}`, { method: 'DELETE', credentials: 'include' });
+          await fetch(`${API_BASE_URL}/api/bookshelf/${editingBook._id}`, { method: 'DELETE', credentials: 'include' });
           setBooks(books.filter(b => b._id !== editingBook._id));
           setIsModalOpen(false); 
         } catch (err) { }
@@ -97,7 +99,7 @@ const Shelves = ({ triggerAlert }) => {
     setBooks(updatedBooks);
     setEditingBook({ ...editingBook, isTopPick: newStatus });
     try {
-      await fetch(`http://localhost:3000/api/bookshelf/${editingBook._id}`, {
+      await fetch(`${API_BASE_URL}/api/bookshelf/${editingBook._id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ isTopPick: newStatus }),
@@ -123,7 +125,7 @@ const Shelves = ({ triggerAlert }) => {
       );
       setBooks(updatedBooks);
       setIsModalOpen(false); 
-      await fetch(`http://localhost:3000/api/bookshelf/${editingBook._id}`, {
+      await fetch(`${API_BASE_URL}/api/bookshelf/${editingBook._id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ shelf: finalShelfName }),
@@ -145,7 +147,7 @@ const Shelves = ({ triggerAlert }) => {
           setBooks(updatedBooks);
           setIsShelfModalOpen(false); 
           await Promise.all(booksInShelf.map(book => 
-            fetch(`http://localhost:3000/api/bookshelf/${book._id}`, {
+            fetch(`${API_BASE_URL}/api/bookshelf/${book._id}`, {
               method: 'PUT',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ shelf: "Want to Read" }),
@@ -173,7 +175,7 @@ const Shelves = ({ triggerAlert }) => {
       setBooks(updatedBooks);
       setIsShelfModalOpen(false);
       await Promise.all(booksInShelf.map(book => 
-        fetch(`http://localhost:3000/api/bookshelf/${book._id}`, {
+        fetch(`${API_BASE_URL}/api/bookshelf/${book._id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ shelf: newShelfName.trim() }),
@@ -225,7 +227,7 @@ const Shelves = ({ triggerAlert }) => {
 
             <p>You need to be logged in to view your library.</p>
 
-            <button className="button bounce-button" onClick={() => window.location.href = 'http://localhost:3000/auth/google'}>
+            <button className="button bounce-button" onClick={() => window.location.href = `${API_BASE_URL}/auth/google`}>
                 Login with Google
             </button>
 
