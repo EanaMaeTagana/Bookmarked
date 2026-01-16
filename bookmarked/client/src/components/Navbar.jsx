@@ -23,7 +23,6 @@ function Navbar({ user, loading }) {
 
   // redirects user to the Google OAuth backend route
   const handleAuth = () => {
-    // UPDATED: Used ${API_BASE_URL}
     window.location.href = `${API_BASE_URL}/auth/google`;
   };
 
