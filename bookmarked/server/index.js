@@ -15,16 +15,22 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const OPEN_LIBRARY_BASE_URL = 'https://openlibrary.org/search.json';
 
+// Needed so secure cookies work behind Render/NGINX proxies
+app.set('trust proxy', 1);
+
 // Database Connection 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('MongoDB connected')) 
   .catch(err => console.error('Connection error:', err));
 
 // Middleware Configuration 
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  process.env.FRONTEND_URL_2
+].filter(Boolean);
+
 app.use(cors({
-  origin: [
-    'https://bookmarked-fawn.vercel.app'
-  ], 
+  origin: allowedOrigins,
   credentials: true,  
   methods: ['GET', 'POST', 'PUT', 'DELETE'], 
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -42,10 +48,9 @@ app.use(session({
     secure: true,
     sameSite: 'none',
     httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000 
-}
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
   } 
-));
+}));
 
 app.use(passport.initialize());
 app.use(passport.session());
