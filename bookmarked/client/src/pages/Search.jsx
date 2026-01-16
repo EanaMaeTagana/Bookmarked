@@ -62,7 +62,7 @@ function Search({ triggerAlert }) {
   const fetchBooks = useCallback(async () => {
     try {
       const url = buildApiUrl();
-      const res = await axios.get(url); 
+      const res = await axios.get(url, { withCredentials: true });
       
       const docs = res.data.docs || [];
       const totalHits = res.data.numFound ? Number(res.data.numFound) : docs.length;
