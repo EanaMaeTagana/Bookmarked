@@ -23,7 +23,7 @@ mongoose.connect(process.env.MONGO_URI)
 // Middleware Configuration 
 app.use(cors({
   origin: [
-    'https://bookmarked-henna.vercel.app'
+    'https://bookmarked-fawn.vercel.app'
   ], 
   credentials: true,  
   methods: ['GET', 'POST', 'PUT', 'DELETE'], 
