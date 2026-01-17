@@ -55,7 +55,7 @@
   background-color: var(--primary-blue);
   color: var(--text-white);
   border: 2px solid var(--primary-blue);
-  padding: 5px 25px;
+  padding: 4px 25px;
   border-radius: 50px;
   cursor: pointer;
   transition: all 0.3s ease;

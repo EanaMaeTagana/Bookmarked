@@ -8,12 +8,27 @@ require('dotenv').config();
 // Route and Config Imports
 const bookshelfRoute = require('./routes/bookshelf');
 const authRoutes = require('./routes/auth');
-const adminRoutes = require('./routes/admin'); 
+const adminRoutes = require('./routes/admin');
+const { verifyToken } = require('./routes/auth'); // Import token verifier
 require('./config/passport'); 
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const OPEN_LIBRARY_BASE_URL = 'https://openlibrary.org/search.json';
+
+// frontend origins allowed to make credentialed requests
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  process.env.FRONTEND_URL_2,
+  'https://bookmarked-henna.vercel.app',
+  'https://bookmarked-fawn.vercel.app',
+  'http://localhost:5173'
+].filter(Boolean);
+
+// allowlist patterns for Vercel preview domains, etc.
+const allowedOriginPatterns = [
+  /\.vercel\.app$/
+];
 
 // Database Connection 
 mongoose.connect(process.env.MONGO_URI)
@@ -21,12 +36,16 @@ mongoose.connect(process.env.MONGO_URI)
   .catch(err => console.error('Connection error:', err));
 
 // Middleware Configuration 
+app.set('trust proxy', 1); // required for secure cookies behind a proxy
+
 app.use(cors({
-  origin: [
-    'https://bookmarked-fawn.vercel.app'
-  ], 
-  credentials: true,  
-  methods: ['GET', 'POST', 'PUT', 'DELETE'], 
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) return callback(null, origin);
+    if (allowedOriginPatterns.some((pattern) => pattern.test(origin))) return callback(null, origin);
+    return callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
@@ -42,13 +61,36 @@ app.use(session({
     secure: true,
     sameSite: 'none',
     httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000 
-}
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
   } 
-));
+}));
 
 app.use(passport.initialize());
 app.use(passport.session());
+
+// Bearer token middleware: if session auth fails, try Authorization header
+app.use((req, res, next) => {
+  console.log('[Bearer Middleware] Path:', req.path, 'Auth:', req.headers.authorization ? 'yes' : 'no', 'User:', req.user ? req.user.email : 'none');
+  if (!req.user && req.headers.authorization) {
+    const authHeader = req.headers.authorization;
+    if (authHeader.startsWith('Bearer ')) {
+      const token = authHeader.slice(7);
+      try {
+        const payload = verifyToken(token);
+        console.log('[Bearer] Token verified for:', payload.email);
+        req.user = {
+          _id: payload.id,
+          googleId: payload.googleId,
+          email: payload.email,
+          avatar: payload.avatar
+        };
+      } catch (err) {
+        console.log('[Bearer] Token verification failed:', err.message);
+      }
+    }
+  }
+  next();
+});
 
 // Health Check Route
 app.get('/health', (req, res) => {

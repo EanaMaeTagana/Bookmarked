@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -14,6 +14,17 @@ const CreateProfile = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
+  // capture token from URL on component mount
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+    if (token && !localStorage.getItem('authToken')) {
+      console.log('[CreateProfile] Token found in URL, storing in localStorage');
+      localStorage.setItem('authToken', token);
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
+
   // handles the final onboarding step to save the user's nickname
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,17 +34,33 @@ const CreateProfile = () => {
     setError('');
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/auth/create-profile`, 
-        { nickname: nickname }, 
-        { withCredentials: true } 
+      const headers = {};
+      const token = localStorage.getItem('authToken');
+      console.log('[CreateProfile] Token available:', token ? 'yes' : 'no');
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+        console.log('[CreateProfile] Sending Authorization header');
+      }
+
+      const response = await axios.post(
+        `${API_BASE_URL}/auth/create-profile`,
+        { nickname: nickname },
+        { headers, withCredentials: true }
       );
 
-      // if successful, move the user into their personal dashboard
-      if (response.data.success) {
+      console.log('[CreateProfile] Response status:', response.status);
+      // if successful (including existing user reuse), move the user into their dashboard
+      if (response.data && response.data.success) {
         navigate('/dashboard');
+        return;
       }
+
+      // fallback if success flag missing
+      setError(response?.data?.error || "Could not create profile. Please try again.");
     } catch (err) {
-      setError("Could not create profile. The server might be busy. Please try again.");
+      console.log('[CreateProfile] Error:', err.response?.status, err.response?.data?.error || err.message);
+      const serverMessage = err?.response?.data?.error || err?.message;
+      setError(serverMessage || "Could not create profile. The server might be busy. Please try again.");
     } finally {
       setLoading(false);
     }
